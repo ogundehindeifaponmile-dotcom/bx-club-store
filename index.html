@@ -38,7 +38,7 @@ fontFamily: {
 body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; overflow-x: hidden; }
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: #f5f5f5; }
-::-webkit-scrollbar-thumb { background: #E30613; }
+::-webkit-scrollbar-thumb { background: #0a0a0a; }
 
 .hero-carousel { position: relative; width: 100%; height: 100vh; min-height: 600px; overflow: hidden; }
 .hero-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease; display: flex; align-items: center; justify-content: center; }
@@ -52,18 +52,18 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .hero-btn:hover { background: transparent; color: #fff; }
 .carousel-dots { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 6; }
 .carousel-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.3s ease; }
-.carousel-dot.active { background: #E30613; transform: scale(1.2); }
+.carousel-dot.active { background: #0a0a0a; transform: scale(1.2); }
 
 .main-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: transparent; border-bottom: none; transition: transform 0.4s ease, background 0.3s ease; }
 .main-nav.hidden { transform: translateY(-100%); }
 .main-nav.scrolled { background: rgba(255,255,255,0.98); backdrop-filter: blur(10px); box-shadow: 0 2px 20px rgba(0,0,0,0.08); }
 .main-nav.scrolled .nav-link { color: #0a0a0a; }
-.main-nav.scrolled .nav-link::after { background: #E30613; }
+.main-nav.scrolled .nav-link::after { background: #0a0a0a; }
 .main-nav.scrolled #cartBtn, .main-nav.scrolled #currencyBtn { color: #0a0a0a !important; }
 .main-nav.scrolled .mobile-menu-btn { color: #0a0a0a; }
 .main-nav.scrolled .nav-logo img { filter: brightness(1) invert(0) contrast(1.2) !important; }
 .nav-link { font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: #ffffff; text-decoration: none; font-weight: 400; padding: 8px 0; position: relative; transition: color 0.3s ease; }
-.nav-link::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: #E30613; transition: width 0.3s ease; }
+.nav-link::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: #0a0a0a; transition: width 0.3s ease; }
 .nav-link:hover::after, .nav-link.active::after { width: 100%; }
 .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 600; letter-spacing: 0.05em; color: #0a0a0a; text-decoration: none; }
 .nav-logo img { height: 60px; width: auto; object-fit: contain; background: transparent !important; filter: brightness(0) invert(1); }
@@ -80,13 +80,13 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .product-card .product-img-wrap { position: relative; overflow: hidden; background: #f5f5f5; aspect-ratio: 3/4; margin-bottom: 12px; }
 .product-card .product-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
 .product-card:hover .product-img-wrap img { transform: scale(1.05); }
-.product-card .quick-view { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%) translateY(10px); opacity: 0; background: #E30613; color: #FFD700; padding: 10px 24px; font-family: 'Oswald', sans-serif; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s ease; white-space: nowrap; }
+.product-card .quick-view { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%) translateY(10px); opacity: 0; background: #0a0a0a; color: #fff; padding: 10px 24px; font-family: 'Oswald', sans-serif; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s ease; white-space: nowrap; }
 .product-card:hover .quick-view { opacity: 1; transform: translateX(-50%) translateY(0); }
 .product-card .product-name { font-size: 0.8rem; font-weight: 400; margin-bottom: 4px; line-height: 1.4; }
 .product-card .product-price { font-size: 0.8rem; font-weight: 500; color: #0a0a0a; }
 .product-card:hover .add-btn { opacity: 1 !important; }
 .add-btn { background: #0a0a0a !important; color: #fff !important; font-family: 'Oswald', sans-serif; font-weight: 600; }
-.add-btn:hover { background: #E30613 !important; color: #FFD700 !important; }
+.add-btn:hover { background: #333 !important; }
 
 .category-banner { position: relative; overflow: hidden; aspect-ratio: 16/9; cursor: pointer; }
 .category-banner img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s ease; }
@@ -94,7 +94,7 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .category-banner .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; flex-direction: column; color: #fff; }
 .category-banner h3 { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 400; margin-bottom: 1rem; }
 .category-banner .shop-link { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: #fff; text-decoration: none; border-bottom: 1px solid #fff; padding-bottom: 4px; transition: all 0.3s ease; }
-.category-banner .shop-link:hover { border-color: #E30613; }
+.category-banner .shop-link:hover { border-color: #0a0a0a; }
 
 .faq-item { border-bottom: 1px solid #e5e5e5; }
 .faq-question { width: 100%; padding: 20px 0; display: flex; justify-content: space-between; align-items: center; background: none; border: none; cursor: pointer; font-size: 0.9rem; font-weight: 500; text-align: left; }
@@ -112,7 +112,7 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
 .modal-overlay.active { display: flex; }
 .modal-content { background: #fff; max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; }
-.modal-close { position: absolute; top: 20px; right: 20px; background: #E30613; color: #FFD700; border: none; width: 36px; height: 36px; font-size: 1rem; cursor: pointer; z-index: 2; font-family: 'Oswald', sans-serif; font-weight: 700; }
+.modal-close { position: absolute; top: 20px; right: 20px; background: #0a0a0a; color: #fff; border: none; width: 36px; height: 36px; font-size: 1rem; cursor: pointer; z-index: 2; font-family: 'Oswald', sans-serif; font-weight: 700; }
 .quick-view-grid { display: grid; grid-template-columns: 1fr 1fr; }
 .quick-view-img { aspect-ratio: 3/4; background: #f5f5f5; }
 .quick-view-img img { width: 100%; height: 100%; object-fit: cover; }
@@ -121,8 +121,8 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .quick-view-info .price { font-size: 1.1rem; font-weight: 500; margin-bottom: 1.5rem; }
 .quick-view-info .desc { font-size: 0.85rem; color: #888; line-height: 1.6; margin-bottom: 1.5rem; }
 .quick-view-info .notes { font-size: 0.75rem; color: #888; margin-bottom: 2rem; }
-.add-to-cart-btn { width: 100%; padding: 16px; background: #E30613; color: #FFD700; border: none; font-family: 'Oswald', sans-serif; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: background 0.3s ease; }
-.add-to-cart-btn:hover { background: #0a0a0a; }
+.add-to-cart-btn { width: 100%; padding: 16px; background: #0a0a0a; color: #fff; border: none; font-family: 'Oswald', sans-serif; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: background 0.3s ease; }
+.add-to-cart-btn:hover { background: #333; }
 
 .cart-drawer { position: fixed; top: 0; right: 0; width: 100%; max-width: 420px; height: 100vh; background: #fff; z-index: 100; transform: translateX(100%); transition: transform 0.4s ease; display: flex; flex-direction: column; }
 .cart-drawer.open { transform: translateX(0); }
@@ -138,26 +138,26 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .cart-qty { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
 .cart-qty button { width: 28px; height: 28px; border: 1px solid #e5e5e5; background: none; cursor: pointer; font-size: 0.8rem; }
 .cart-qty span { font-size: 0.8rem; min-width: 20px; text-align: center; }
-.remove-item { background: none; border: none; color: #E30613; cursor: pointer; font-size: 0.75rem; margin-top: 8px; font-family: 'Oswald', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-.remove-item:hover { color: #0a0a0a; }
+.remove-item { background: none; border: none; color: #0a0a0a; cursor: pointer; font-size: 0.75rem; margin-top: 8px; font-family: 'Oswald', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.remove-item:hover { color: #666; }
 .cart-subtotal { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem; }
 .cart-total { display: flex; justify-content: space-between; font-size: 1rem; font-weight: 500; margin-bottom: 20px; padding-top: 12px; border-top: 1px solid #e5e5e5; font-family: 'Oswald', sans-serif; font-weight: 700; }
-.checkout-btn { width: 100%; padding: 16px; background: #E30613; color: #FFD700; border: none; font-family: 'Oswald', sans-serif; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; margin-bottom: 10px; transition: background 0.3s ease; }
-.checkout-btn:hover { background: #0a0a0a; color: #FFD700; }
+.checkout-btn { width: 100%; padding: 16px; background: #0a0a0a; color: #fff; border: none; font-family: 'Oswald', sans-serif; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; margin-bottom: 10px; transition: background 0.3s ease; }
+.checkout-btn:hover { background: #333; }
 .checkout-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .checkout-form input, .checkout-form textarea, .checkout-form select { width: 100%; padding: 14px 16px; border: 1px solid #e5e5e5; font-size: 0.85rem; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.3s ease; margin-bottom: 12px; }
-.checkout-form input:focus, .checkout-form textarea:focus, .checkout-form select:focus { border-color: #635bff; }
+.checkout-form input:focus, .checkout-form textarea:focus, .checkout-form select:focus { border-color: #0a0a0a; }
 .checkout-form label { display: block; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; color: #888; font-family: 'Oswald', sans-serif; font-weight: 600; }
 
 .currency-toggle { display: inline-flex; align-items: center; gap: 4px; background: none; border: 1px solid currentColor; color: inherit; font-family: 'Oswald', sans-serif; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; cursor: pointer; transition: all 0.3s ease; border-radius: 2px; }
-.currency-toggle:hover { background: rgba(227,6,19,0.1); color: #E30613; }
+.currency-toggle:hover { background: rgba(0,0,0,0.05); }
 .main-nav.scrolled .currency-toggle { color: #0a0a0a; border-color: #0a0a0a; }
-.main-nav.scrolled .currency-toggle:hover { background: rgba(227,6,19,0.1); color: #E30613; border-color: #E30613; }
+.main-nav.scrolled .currency-toggle:hover { background: rgba(0,0,0,0.05); }
 
-.toast-msg { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #0a0a0a; color: #FFD700; padding: 14px 32px; font-family: 'Oswald', sans-serif; font-size: 0.85rem; font-weight: 600; z-index: 10000; opacity: 0; transition: all 0.4s ease; white-space: nowrap; border: 2px solid #E30613; letter-spacing: 0.05em; }
+.toast-msg { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #0a0a0a; color: #fff; padding: 14px 32px; font-family: 'Oswald', sans-serif; font-size: 0.85rem; font-weight: 600; z-index: 10000; opacity: 0; transition: all 0.4s ease; white-space: nowrap; letter-spacing: 0.05em; }
 .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.currency-detect-loader { position: fixed; top: 80px; right: 20px; z-index: 60; background: #0a0a0a; color: #FFD700; padding: 8px 16px; font-family: 'Oswald', sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 2px; opacity: 0; transform: translateY(-10px); transition: all 0.4s ease; pointer-events: none; border: 2px solid #E30613; }
+.currency-detect-loader { position: fixed; top: 80px; right: 20px; z-index: 60; background: #0a0a0a; color: #fff; padding: 8px 16px; font-family: 'Oswald', sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 2px; opacity: 0; transform: translateY(-10px); transition: all 0.4s ease; pointer-events: none; }
 .currency-detect-loader.show { opacity: 1; transform: translateY(0); }
 
 @media (min-width: 768px) { .md\:hidden { display: none !important; } }
@@ -171,7 +171,7 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .whatsapp-float { position: fixed; bottom: 30px; right: 30px; z-index: 90; width: 56px; height: 56px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(37, 211, 102, 0.4); cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
 .whatsapp-float:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(37, 211, 102, 0.5); }
 .whatsapp-float i { color: #fff; font-size: 1.6rem; }
-.whatsapp-tooltip { position: fixed; bottom: 40px; right: 96px; background: #0a0a0a; color: #FFD700; padding: 8px 14px; font-family: 'Oswald', sans-serif; font-size: 0.75rem; font-weight: 600; border-radius: 4px; white-space: nowrap; opacity: 0; transform: translateX(10px); transition: all 0.3s ease; pointer-events: none; z-index: 89; }
+.whatsapp-tooltip { position: fixed; bottom: 40px; right: 96px; background: #0a0a0a; color: #fff; padding: 8px 14px; font-family: 'Oswald', sans-serif; font-size: 0.75rem; font-weight: 600; border-radius: 4px; white-space: nowrap; opacity: 0; transform: translateX(10px); transition: all 0.3s ease; pointer-events: none; z-index: 89; }
 .whatsapp-tooltip::after { content: ''; position: absolute; top: 50%; right: -6px; transform: translateY(-50%); border-width: 6px 0 6px 6px; border-style: solid; border-color: transparent transparent transparent #0a0a0a; }
 .whatsapp-float:hover + .whatsapp-tooltip, .whatsapp-tooltip:hover { opacity: 1; transform: translateX(0); }
 @media (max-width: 768px) { .whatsapp-float { width: 48px; height: 48px; bottom: 20px; right: 20px; } .whatsapp-float i { font-size: 1.4rem; } .whatsapp-tooltip { display: none; } }
@@ -201,7 +201,7 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .email-note i { color: #FFD700; margin-right: 6px; }
 @media (max-width: 480px) { .success-card { padding: 32px 20px; } .success-card h1 { font-size: 1.5rem; } }
 
-.mm-step-badge { width: 36px; height: 36px; border-radius: 50%; background: #E30613; color: #FFD700; display: flex; align-items: center; justify-content: center; font-family: 'Oswald', sans-serif; font-size: 1rem; font-weight: 700; }
+.mm-step-badge { width: 36px; height: 36px; border-radius: 50%; background: #0a0a0a; color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Oswald', sans-serif; font-size: 1rem; font-weight: 700; }
 .mm-step-title { font-family: 'Oswald', sans-serif; font-size: 1.3rem; font-weight: 700; color: #0a0a0a; text-transform: uppercase; letter-spacing: 0.05em; }
 </style>
 <base target="_blank">
@@ -234,14 +234,14 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 <button onclick="toggleCurrency()" class="currency-toggle" id="currencyBtn" title="Switch currency">NGN</button>
 <button onclick="toggleCart()" id="cartBtn" style="background:none;border:none;cursor:pointer;position:relative;color:#ffffff;">
 <i class="fas fa-shopping-bag text-lg"></i>
-<span id="cartBadge" style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;background:#E30613;color:#FFD700;font-size:0.65rem;border-radius:50%;display:none;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-weight:700;">0</span>
+<span id="cartBadge" style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;background:#0a0a0a;color:#fff;font-size:0.65rem;border-radius:50%;display:none;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-weight:700;">0</span>
 </button>
 </div>
 <div class="flex items-center gap-4 md:ml-auto" style="position:relative;z-index:2;">
 <button onclick="toggleCurrency()" class="currency-toggle md:hidden" id="currencyBtnMobile" title="Switch currency">NGN</button>
 <button onclick="toggleCart()" id="cartBtnMobile" class="md:hidden" style="background:none;border:none;cursor:pointer;position:relative;color:#ffffff;">
 <i class="fas fa-shopping-bag text-lg"></i>
-<span id="cartBadgeMobile" style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;background:#E30613;color:#FFD700;font-size:0.65rem;border-radius:50%;display:none;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-weight:700;">0</span>
+<span id="cartBadgeMobile" style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;background:#0a0a0a;color:#fff;font-size:0.65rem;border-radius:50%;display:none;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-weight:700;">0</span>
 </button>
 <button class="mobile-menu-btn md:hidden" onclick="toggleMobileMenu()">
 <i class="fas fa-bars"></i>
@@ -335,7 +335,7 @@ Pick any two items and create your own bundle. Mix a candle with a diffuser, or 
 <div style="border-top:1px solid #e5e5e5; padding-top:20px;">
 <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.85rem; color:#888;"><span>Individual Total</span><span id="mmOriginalTotal" style="text-decoration:line-through;">₦0.00</span></div>
 <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.85rem; font-family:'Oswald',sans-serif; font-weight:600;"><span style="color:#4ade80;">Bundle Discount (-10%)</span><span id="mmDiscountAmount" style="color:#4ade80;">-0.00</span></div>
-<div style="display:flex; justify-content:space-between; font-size:1.3rem; font-weight:700; border-top:1px solid #0a0a0a; padding-top:12px; font-family:'Oswald',sans-serif;"><span>Bundle Total</span><span id="mmBundleTotal" style="color:#E30613;">₦0.00</span></div>
+<div style="display:flex; justify-content:space-between; font-size:1.3rem; font-weight:700; border-top:1px solid #0a0a0a; padding-top:12px; font-family:'Oswald',sans-serif;"><span>Bundle Total</span><span id="mmBundleTotal" style="color:#0a0a0a;">₦0.00</span></div>
 </div>
 <button class="checkout-btn" style="margin-top:24px;" onclick="addBundleToCart()"><i class="fas fa-shopping-bag" style="margin-right:8px;"></i>Add Bundle to Cart</button>
 <button onclick="resetMixMatch()" style="width:100%; padding:14px; background:none; color:#888; border:1px solid #e5e5e5; font-family:'Oswald',sans-serif; font-size:0.8rem; font-weight:600; letter-spacing:0.15em; text-transform:uppercase; cursor:pointer; margin-top:10px; transition:all 0.3s ease;">Start Over</button>
@@ -382,9 +382,9 @@ Pick any two items and create your own bundle. Mix a candle with a diffuser, or 
 <div class="section-heading"><p>Get In Touch</p><h2>Contact Us</h2></div>
 <div class="grid md:grid-cols-2 gap-12">
 <div>
-<div class="mb-8"><h4 style="font-family:'Oswald',sans-serif;font-size:0.8rem;letter-spacing:0.2em;text-transform:uppercase;color:#E30613;margin-bottom:8px;font-weight:600;">Email</h4><a href="mailto:bxclubhq@gmail.com" style="font-size:0.9rem;color:#0a0a0a;text-decoration:none;">bxclubhq@gmail.com</a></div>
-<div class="mb-8"><h4 style="font-family:'Oswald',sans-serif;font-size:0.8rem;letter-spacing:0.2em;text-transform:uppercase;color:#E30613;margin-bottom:8px;font-weight:600;">Phone</h4><a href="tel:+447538277711" style="font-size:0.9rem;color:#0a0a0a;text-decoration:none;">+44 7538 277711</a></div>
-<div class="mb-8"><h4 style="font-family:'Oswald',sans-serif;font-size:0.8rem;letter-spacing:0.2em;text-transform:uppercase;color:#E30613;margin-bottom:8px;font-weight:600;">Follow Us</h4><div class="flex gap-4"><a href="https://www.instagram.com/bxclubhq/" target="_blank" style="font-size:1.2rem;color:#0a0a0a;"><i class="fab fa-instagram"></i></a></div></div>
+<div class="mb-8"><h4 style="font-family:'Oswald',sans-serif;font-size:0.8rem;letter-spacing:0.2em;text-transform:uppercase;color:#FFD700;margin-bottom:8px;font-weight:600;">Email</h4><a href="mailto:bxclubhq@gmail.com" style="font-size:0.9rem;color:#0a0a0a;text-decoration:none;">bxclubhq@gmail.com</a></div>
+<div class="mb-8"><h4 style="font-family:'Oswald',sans-serif;font-size:0.8rem;letter-spacing:0.2em;text-transform:uppercase;color:#FFD700;margin-bottom:8px;font-weight:600;">Phone</h4><a href="tel:+447538277711" style="font-size:0.9rem;color:#0a0a0a;text-decoration:none;">+44 7538 277711</a></div>
+<div class="mb-8"><h4 style="font-family:'Oswald',sans-serif;font-size:0.8rem;letter-spacing:0.2em;text-transform:uppercase;color:#FFD700;margin-bottom:8px;font-weight:600;">Follow Us</h4><div class="flex gap-4"><a href="https://www.instagram.com/bxclubhq/" target="_blank" style="font-size:1.2rem;color:#0a0a0a;"><i class="fab fa-instagram"></i></a></div></div>
 </div>
 <form onsubmit="handleContact(event)" class="checkout-form">
 <input type="text" placeholder="Your Name" required>
@@ -401,7 +401,7 @@ Pick any two items and create your own bundle. Mix a candle with a diffuser, or 
 <div><h4>Shop</h4><ul style="list-style:none;padding:0;"><li style="margin-bottom:10px;"><a href="#shop">New In</a></li><li style="margin-bottom:10px;"><a href="#shop">All Products</a></li><li style="margin-bottom:10px;"><a href="#collections">Collections</a></li><li style="margin-bottom:10px;"><a href="#" onclick="filterByCollection('summer'); return false;">Summer in London</a></li><li><a href="#" onclick="filterByCollection('midnight'); return false;">Midnight in Lagos</a></li></ul></div>
 <div><h4>Support</h4><ul style="list-style:none;padding:0;"><li style="margin-bottom:10px;"><a href="#faqs">FAQs</a></li><li style="margin-bottom:10px;"><a href="#" onclick="showToast('Shipping info coming soon'); return false;">Shipping</a></li><li style="margin-bottom:10px;"><a href="#" onclick="showToast('Returns policy coming soon'); return false;">Returns</a></li><li><a href="#" onclick="showToast('Track order coming soon'); return false;">Track Order</a></li></ul></div>
 <div><h4>Company</h4><ul style="list-style:none;padding:0;"><li style="margin-bottom:10px;"><a href="#about">About Us</a></li><li style="margin-bottom:10px;"><a href="#contact">Contact</a></li><li style="margin-bottom:10px;"><a href="#" onclick="showToast('Privacy policy coming soon'); return false;">Privacy Policy</a></li><li><a href="#" onclick="showToast('Terms coming soon'); return false;">Terms of Service</a></li></ul></div>
-<div><h4>Newsletter</h4><p style="font-size:0.75rem;color:#666;margin-bottom:16px;">Subscribe for exclusive drops and updates.</p><form onsubmit="handleNewsletter(event)" style="display:flex;"><input type="email" placeholder="Your email" style="flex:1;padding:10px 12px;border:1px solid #333;background:transparent;color:#fff;font-size:0.75rem;outline:none;"><button type="submit" style="padding:10px 16px;background:#E30613;color:#FFD700;border:none;font-family:'Oswald',sans-serif;font-size:0.75rem;font-weight:700;cursor:pointer;letter-spacing:0.1em;">JOIN</button></form></div>
+<div><h4>Newsletter</h4><p style="font-size:0.75rem;color:#666;margin-bottom:16px;">Subscribe for exclusive drops and updates.</p><form onsubmit="handleNewsletter(event)" style="display:flex;"><input type="email" placeholder="Your email" style="flex:1;padding:10px 12px;border:1px solid #333;background:transparent;color:#fff;font-size:0.75rem;outline:none;"><button type="submit" style="padding:10px 16px;background:#0a0a0a;color:#fff;border:none;font-family:'Oswald',sans-serif;font-size:0.75rem;font-weight:700;cursor:pointer;letter-spacing:0.1em;">JOIN</button></form></div>
 </div>
 <div style="border-top:1px solid #222;padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
 <p style="font-size:0.7rem;color:#666;">© 2026 BX CLUB by Blackxcellencee. All rights reserved.</p>
@@ -435,8 +435,8 @@ Pick any two items and create your own bundle. Mix a candle with a diffuser, or 
 <div class="cart-drawer-header">
 <h3>Your Cart</h3>
 <div style="display:flex;align-items:center;gap:12px;">
-<button onclick="toggleCurrency()" class="currency-toggle" id="cartCurrencyBtn" style="color:#FFD700;border-color:#FFD700;">NGN</button>
-<button onclick="toggleCart()" style="background:none;border:none;cursor:pointer;font-size:1.1rem;color:#FFD700;"><i class="fas fa-times"></i></button>
+<button onclick="toggleCurrency()" class="currency-toggle" id="cartCurrencyBtn" style="color:#fff;border-color:#fff;">NGN</button>
+<button onclick="toggleCart()" style="background:none;border:none;cursor:pointer;font-size:1.1rem;color:#fff;"><i class="fas fa-times"></i></button>
 </div>
 </div>
 <div class="cart-drawer-body" id="cartBody">
@@ -463,7 +463,7 @@ Pick any two items and create your own bundle. Mix a candle with a diffuser, or 
 <button onclick="toggleCurrency()" class="currency-toggle" id="invoiceCurrencyBtn" style="color:#0a0a0a;border-color:#0a0a0a;">NGN</button>
 </div>
 <div style="background:#f5f5f5;padding:20px;margin-bottom:24px;">
-<h4 style="font-family:'Oswald',sans-serif;font-size:0.8rem;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:16px;font-weight:600;color:#E30613;">Order Summary</h4>
+<h4 style="font-family:'Oswald',sans-serif;font-size:0.8rem;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:16px;font-weight:600;color:#0a0a0a;">Order Summary</h4>
 <div id="invoiceSummary"></div>
 <div style="border-top:1px solid #e5e5e5;margin-top:16px;padding-top:16px;">
 <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.85rem;"><span>Subtotal</span><span id="invoiceSubtotal">0.00</span></div>
@@ -493,11 +493,11 @@ Pick any two items and create your own bundle. Mix a candle with a diffuser, or 
 <button onclick="toggleCurrency()" class="currency-toggle" id="paymentCurrencyBtn" style="color:#0a0a0a;border-color:#0a0a0a;">NGN</button>
 </div>
 <div style="background:#f5f5f5;padding:20px;margin-bottom:24px;">
-<h4 style="font-family:'Oswald',sans-serif;font-size:0.8rem;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:12px;font-weight:600;color:#E30613;">Final Total</h4>
+<h4 style="font-family:'Oswald',sans-serif;font-size:0.8rem;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:12px;font-weight:600;color:#0a0a0a;">Final Total</h4>
 <div id="paymentSummary"></div>
 <div style="border-top:1px solid #e5e5e5;margin-top:12px;padding-top:12px;">
 <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.85rem;"><span>Subtotal</span><span id="paymentSubtotal">₦0.00</span></div>
-<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.85rem;color:#888;"><span><i class="fas fa-truck" style="margin-right:6px;"></i>Shipping</span><span id="paymentShipping">₦0.00</span></div>
+<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.85rem;color:#888;"><span><i class="fas fa-truck" style="margin-right:6px;"></i>Shipping</span><span id="paymentShipping">0.00</span></div>
 <div style="display:flex;justify-content:space-between;font-weight:700;border-top:1px solid #0a0a0a;margin-top:8px;padding-top:12px;font-family:'Oswald',sans-serif;"><span>Amount to Pay</span><span id="paymentTotalAmount">0.00</span></div>
 </div>
 </div>
@@ -523,8 +523,9 @@ Pick any two items and create your own bundle. Mix a candle with a diffuser, or 
 
 <div style="margin:20px 0; text-align:center;">
 <div style="background:#f8f9ff; border:1px solid #e0e4ff; padding:16px; border-radius:8px; margin-bottom:16px;">
-<svg viewBox="0 0 60 25" xmlns="http://www.w3.org/2000/svg" style="height:24px; margin-bottom:8px;">
-<path fill="#635bff" d="M59.64 14.28h-8.06c.19 1.93 1.6 2.55 3.2 2.55 1.64 0 2.96-.37 4.05-.95v3.32a10.33 10.33 0 0 1-4.56.95c-4.01 0-6.83-2.5-6.83-7.5 0-4.2 2.39-7.5 6.3-7.5 3.92 0 5.96 3.28 5.96 7.47 0 .4-.04 1.26-.06 1.66zm-4.18-4.4c0-1.18-.69-2.5-2.1-2.5-1.41 0-2.28 1.32-2.38 2.5h4.48zM40.25 13.1c0 1.04.12 1.88.31 2.5.22.67.52 1.17.9 1.5.38.33.84.5 1.38.5.74 0 1.31-.27 1.71-.82.4-.55.6-1.33.6-2.34V5.17h4.08v9.2c0 2.1-.56 3.68-1.68 4.74-1.12 1.06-2.67 1.59-4.65 1.59-2.12 0-3.76-.63-4.92-1.89-1.16-1.26-1.74-3.08-1.74-5.46V5.17h4.08v7.93h.13zM28.5 5.17v14.9h-4.08V5.17h4.08zm0-3.83v2.5h-4.08v-2.5h4.08zM18.3 14.28h-8.06c.19 1.93 1.6 2.55 3.2 2.55 1.64 0 2.96-.37 4.05-.95v3.32a10.33 10.33 0 0 1-4.56.95c-4.01 0-6.83-2.5-6.83-7.5 0-4.2 2.39-7.5 6.3-7.5 3.92 0 5.96 3.28 5.96 7.47 0 .4-.04 1.26-.06 1.66zm-4.18-4.4c0-1.18-.69-2.5-2.1-2.5-1.41 0-2.28 1.32-2.38 2.5h4.48zM10.1 5.17v14.9H6.02V5.17h4.08zm0-3.83v2.5H6.02v-2.5h4.08z"/>
+<svg width="100" height="30" viewBox="0 0 100 30" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:8px;">
+<rect width="100" height="30" fill="#635BFF"/>
+<path d="M19.5 15.5c0 3.5-2.5 5.5-6 5.5s-6-2-6-5.5 2.5-5.5 6-5.5 6 2 6 5.5zm-6 3.5c2 0 3.5-1.5 3.5-3.5S15.5 12 13.5 12 10 13.5 10 15.5s1.5 3.5 3.5 3.5zm13-3.5h3v6h-3v-6zm-1.5-1c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5zm10 3h-2v-3h2v3zm-2-4.5c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5zm6 1.5h2v6h-2v-6zm6 0h2v6h-2v-6zm-1.5-1c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5zm7 0h2v6h-2v-6zm-1.5-1c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5z" fill="white"/>
 </svg>
 <p style="font-size:0.8rem; color:#635bff; font-weight:600; font-family:'Oswald',sans-serif;">Secure Payment via Stripe</p>
 <p style="font-size:0.7rem; color:#888; margin-top:4px;">You will be redirected to a secure Stripe page to complete your payment.</p>
@@ -549,7 +550,7 @@ function safeRemove(key) { try { localStorage.removeItem(key); } catch(e) {} }
 const ADMIN_EMAIL = 'bxclubhq@gmail.com';
 
 const countryCurrencyMap = { 'NG': 'NGN', 'GB': 'GBP', 'US': 'USD', 'EU': 'EUR', 'CA': 'CAD', 'AU': 'AUD', 'ZA': 'ZAR', 'GH': 'GHS', 'KE': 'KES', 'IN': 'INR', 'JP': 'JPY', 'CN': 'CNY', 'FR': 'EUR', 'DE': 'EUR', 'IT': 'EUR', 'ES': 'EUR' };
-const currencySymbols = { 'NGN': '₦', 'GBP': '£', 'USD': '$', 'EUR': '€', 'ZAR': 'R', 'GHS': '₵', 'KES': 'KSh', 'INR': '', 'JPY': '¥', 'CNY': '¥', 'CAD': 'C$', 'AUD': 'A$' };
+const currencySymbols = { 'NGN': '₦', 'GBP': '£', 'USD': '$', 'EUR': '€', 'ZAR': 'R', 'GHS': '', 'KES': 'KSh', 'INR': '', 'JPY': '¥', 'CNY': '¥', 'CAD': 'C$', 'AUD': 'A$' };
 const FALLBACK_CURRENCY = 'USD';
 
 const products = [
@@ -736,8 +737,8 @@ const countrySelect = document.getElementById('invoiceCountry');
 if(detectedCountry === 'GB') countrySelect.value = 'uk'; else if(detectedCountry === 'NG') countrySelect.value = 'nigeria';
 document.getElementById('invoiceSummary').innerHTML = cart.map(item => {
 const info = getCartItemPrice(item);
-if (item.isBundle && item.bundleItems) return '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.85rem;"><span>' + item.name + '</span><span style="color:#E30613;font-family:\'Oswald\',sans-serif;font-weight:600;">' + info.symbol + formatPrice(info.price * item.quantity) + '</span></div>';
-return '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.85rem;"><span>' + item.shortName + ' × ' + item.quantity + '</span><span style="color:#E30613;font-family:\'Oswald\',sans-serif;font-weight:600;">' + info.symbol + formatPrice(info.price * item.quantity) + '</span></div>';
+if (item.isBundle && item.bundleItems) return '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.85rem;"><span>' + item.name + '</span><span style="color:#0a0a0a;font-family:\'Oswald\',sans-serif;font-weight:600;">' + info.symbol + formatPrice(info.price * item.quantity) + '</span></div>';
+return '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.85rem;"><span>' + item.shortName + ' × ' + item.quantity + '</span><span style="color:#0a0a0a;font-family:\'Oswald\',sans-serif;font-weight:600;">' + info.symbol + formatPrice(info.price * item.quantity) + '</span></div>';
 }).join('');
 const symbol = currencySymbols[currentCurrency] || currentCurrency;
 document.getElementById('invoiceSubtotal').textContent = symbol + formatPrice(getCartSubtotal());
@@ -762,8 +763,8 @@ if(cart.length === 0) return;
 const country = document.getElementById('coCountry').value; const symbol = currencySymbols[currentCurrency] || currentCurrency;
 document.getElementById('paymentSummary').innerHTML = cart.map(item => {
 const info = getCartItemPrice(item);
-if (item.isBundle && item.bundleItems) return '<div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.8rem;"><span>' + item.name + '</span><span style="color:#E30613;font-family:\'Oswald\',sans-serif;font-weight:600;">' + info.symbol + formatPrice(info.price * item.quantity) + '</span></div>';
-return '<div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.8rem;"><span>' + item.shortName + ' × ' + item.quantity + '</span><span style="color:#E30613;font-family:\'Oswald\',sans-serif;font-weight:600;">' + info.symbol + formatPrice(info.price * item.quantity) + '</span></div>';
+if (item.isBundle && item.bundleItems) return '<div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.8rem;"><span>' + item.name + '</span><span style="color:#0a0a0a;font-family:\'Oswald\',sans-serif;font-weight:600;">' + info.symbol + formatPrice(info.price * item.quantity) + '</span></div>';
+return '<div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.8rem;"><span>' + item.shortName + ' × ' + item.quantity + '</span><span style="color:#0a0a0a;font-family:\'Oswald\',sans-serif;font-weight:600;">' + info.symbol + formatPrice(info.price * item.quantity) + '</span></div>';
 }).join('');
 const subtotal = getCartSubtotal(); const ship = getShippingCost(country);
 document.getElementById('paymentSubtotal').textContent = symbol + formatPrice(subtotal);
@@ -844,7 +845,7 @@ async function placeOrder(e) {
     }
 }
 
-function renderFAQs() { document.getElementById('faqList').innerHTML = faqs.map((faq, i) => '<div class="faq-item" id="faq-' + i + '"><button class="faq-question" onclick="toggleFAQ(' + i + ')">' + faq.q + '<i class="fas fa-chevron-down" style="font-size:0.7rem;color:#E30613;"></i></button><div class="faq-answer"><p>' + faq.a + '</p></div></div>').join(''); }
+function renderFAQs() { document.getElementById('faqList').innerHTML = faqs.map((faq, i) => '<div class="faq-item" id="faq-' + i + '"><button class="faq-question" onclick="toggleFAQ(' + i + ')">' + faq.q + '<i class="fas fa-chevron-down" style="font-size:0.7rem;color:#0a0a0a;"></i></button><div class="faq-answer"><p>' + faq.a + '</p></div></div>').join(''); }
 function toggleFAQ(index) { document.getElementById('faq-' + index).classList.toggle('open'); }
 function handleContact(e) { e.preventDefault(); showToast('Message sent!'); e.target.reset(); }
 function handleNewsletter(e) { e.preventDefault(); showToast('Subscribed!'); e.target.reset(); }
@@ -864,8 +865,8 @@ document.addEventListener('keydown', (e) => { if(e.key === 'Escape') { closeQuic
 
 let mmSelected1 = null; let mmSelected2 = null; const MM_DISCOUNT_PERCENT = 10;
 const mmEligibleProducts = products.filter(p => p.type === 'candle' || p.type === 'diffuser');
-function renderMixMatchGrid1() { const grid = document.getElementById('mmGrid1'); if (!grid) return; grid.innerHTML = mmEligibleProducts.map(p => { const info = getProductPrice(p); const isSelected = mmSelected1 && mmSelected1.id === p.id; return '<div class="product-card" style="' + (isSelected ? 'outline:2px solid #E30613; outline-offset:4px;' : '') + '" onclick="selectMM1(' + p.id + ')"><div class="product-img-wrap" style="background:#f5f5f5;"><img src="' + p.image + '" alt="' + p.shortName + '" loading="lazy">' + (isSelected ? '<div style="position:absolute;inset:0;background:rgba(227,6,19,0.1);display:flex;align-items:center;justify-content:center;"><span style="background:#E30613;color:#FFD700;padding:8px 16px;font-family:\'Oswald\',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Selected</span></div>' : '') + '</div><div style="cursor:pointer; padding-top:12px;"><h3 class="product-name" style="color:#0a0a0a;">' + p.shortName + '</h3><p class="product-price">' + info.symbol + formatPrice(info.price) + '</p></div></div>'; }).join(''); }
-function renderMixMatchGrid2() { const grid = document.getElementById('mmGrid2'); if (!grid) return; const available = mmEligibleProducts.filter(p => !mmSelected1 || p.id !== mmSelected1.id); grid.innerHTML = available.map(p => { const info = getProductPrice(p); const isSelected = mmSelected2 && mmSelected2.id === p.id; return '<div class="product-card" style="' + (isSelected ? 'outline:2px solid #E30613; outline-offset:4px;' : '') + '" onclick="selectMM2(' + p.id + ')"><div class="product-img-wrap" style="background:#f5f5f5;"><img src="' + p.image + '" alt="' + p.shortName + '" loading="lazy">' + (isSelected ? '<div style="position:absolute;inset:0;background:rgba(227,6,19,0.1);display:flex;align-items:center;justify-content:center;"><span style="background:#E30613;color:#FFD700;padding:8px 16px;font-family:\'Oswald\',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Selected</span></div>' : '') + '</div><div style="cursor:pointer; padding-top:12px;"><h3 class="product-name" style="color:#0a0a0a;">' + p.shortName + '</h3><p class="product-price">' + info.symbol + formatPrice(info.price) + '</p></div></div>'; }).join(''); }
+function renderMixMatchGrid1() { const grid = document.getElementById('mmGrid1'); if (!grid) return; grid.innerHTML = mmEligibleProducts.map(p => { const info = getProductPrice(p); const isSelected = mmSelected1 && mmSelected1.id === p.id; return '<div class="product-card" style="' + (isSelected ? 'outline:2px solid #0a0a0a; outline-offset:4px;' : '') + '" onclick="selectMM1(' + p.id + ')"><div class="product-img-wrap" style="background:#f5f5f5;"><img src="' + p.image + '" alt="' + p.shortName + '" loading="lazy">' + (isSelected ? '<div style="position:absolute;inset:0;background:rgba(0,0,0,0.1);display:flex;align-items:center;justify-content:center;"><span style="background:#0a0a0a;color:#fff;padding:8px 16px;font-family:\'Oswald\',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Selected</span></div>' : '') + '</div><div style="cursor:pointer; padding-top:12px;"><h3 class="product-name" style="color:#0a0a0a;">' + p.shortName + '</h3><p class="product-price">' + info.symbol + formatPrice(info.price) + '</p></div></div>'; }).join(''); }
+function renderMixMatchGrid2() { const grid = document.getElementById('mmGrid2'); if (!grid) return; const available = mmEligibleProducts.filter(p => !mmSelected1 || p.id !== mmSelected1.id); grid.innerHTML = available.map(p => { const info = getProductPrice(p); const isSelected = mmSelected2 && mmSelected2.id === p.id; return '<div class="product-card" style="' + (isSelected ? 'outline:2px solid #0a0a0a; outline-offset:4px;' : '') + '" onclick="selectMM2(' + p.id + ')"><div class="product-img-wrap" style="background:#f5f5f5;"><img src="' + p.image + '" alt="' + p.shortName + '" loading="lazy">' + (isSelected ? '<div style="position:absolute;inset:0;background:rgba(0,0,0,0.1);display:flex;align-items:center;justify-content:center;"><span style="background:#0a0a0a;color:#fff;padding:8px 16px;font-family:\'Oswald\',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Selected</span></div>' : '') + '</div><div style="cursor:pointer; padding-top:12px;"><h3 class="product-name" style="color:#0a0a0a;">' + p.shortName + '</h3><p class="product-price">' + info.symbol + formatPrice(info.price) + '</p></div></div>'; }).join(''); }
 function selectMM1(productId) { mmSelected1 = mmEligibleProducts.find(p => p.id === productId); mmSelected2 = null; renderMixMatchGrid1(); document.getElementById('mmStep2').style.display = 'block'; document.getElementById('mmStep3').style.display = 'none'; setTimeout(() => document.getElementById('mmStep2').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100); renderMixMatchGrid2(); }
 function selectMM2(productId) { mmSelected2 = mmEligibleProducts.find(p => p.id === productId); renderMixMatchGrid2(); showBundleSummary(); }
 function showBundleSummary() {
