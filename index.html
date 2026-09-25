@@ -42,47 +42,6 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 
 #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
 
-.sale-hanging-overlay { position: absolute; top: 0; left: 0; right: 0; z-index: 5; display: flex; justify-content: center; align-items: flex-start; pointer-events: none; padding-top: 0; }
-.sale-swing-anchor { position: relative; display: flex; flex-direction: column; align-items: center; transform-origin: top center; animation: signSwing 5s ease-in-out infinite; pointer-events: auto; }
-@keyframes signSwing { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
-.sale-rope-left, .sale-rope-right { position: absolute; top: 0; width: 3px; height: 70px; background: repeating-linear-gradient(180deg, #8b6f47 0px, #a0825a 3px, #6b5535 6px, #8b6f47 9px); box-shadow: 1px 0 3px rgba(0,0,0,0.6); }
-.sale-rope-left { left: 55px; } .sale-rope-right { right: 55px; }
-.sale-rope-left::before, .sale-rope-right::before { content: ''; position: absolute; top: -5px; left: -5px; width: 13px; height: 13px; background: radial-gradient(circle at 30% 30%, #f5d76e 0%, #FFD700 40%, #6b5535 100%); border-radius: 50%; box-shadow: 0 0 6px rgba(0,0,0,0.7); }
-.sale-rope-left::after, .sale-rope-right::after { content: ''; position: absolute; bottom: -4px; left: -4px; width: 11px; height: 11px; background: radial-gradient(circle at 30% 30%, #FFD700 40%, #4a3820 100%); border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.5); }
-.sale-ribbon { position: relative; background: #E30613; color: #fff; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.25em; text-transform: uppercase; padding: 8px 28px; margin-top: 65px; transform: rotate(-3deg); box-shadow: 0 4px 12px rgba(227,6,19,0.4); z-index: 3; }
-.sale-ribbon::before { content: ''; position: absolute; left: -12px; top: 0; bottom: 0; width: 0; border-top: 18px solid transparent; border-bottom: 18px solid transparent; border-right: 12px solid #E30613; }
-.sale-ribbon::after { content: ''; position: absolute; right: -12px; top: 0; bottom: 0; width: 0; border-top: 18px solid transparent; border-bottom: 18px solid transparent; border-left: 12px solid #E30613; }
-.sale-sign-board { position: relative; margin-top: -8px; background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 50%, #0a0a0a 100%); border: 2px solid #333; border-radius: 4px; padding: 16px 48px 20px; box-shadow: 0 16px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,215,0,0.15); text-align: center; min-width: 340px; max-width: 92vw; }
-.sale-sign-board::before { content: ''; position: absolute; top: 6px; left: 6px; right: 6px; bottom: 6px; border: 1px solid rgba(255,215,0,0.2); border-radius: 2px; pointer-events: none; }
-.sale-sign-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.sale-sign-title { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: clamp(2rem, 5vw, 3.2rem); color: #fff; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1; text-shadow: 3px 3px 0 rgba(0,0,0,0.5); }
-.sale-sign-title .sale-off { color: #FFD700; display: inline-block; transform: rotate(-2deg); text-shadow: 3px 3px 0 rgba(0,0,0,0.5); }
-.sale-sign-sub { font-family: 'Inter', sans-serif; font-size: 0.65rem; color: #ccc; letter-spacing: 0.2em; text-transform: uppercase; margin-top: 6px; font-weight: 500; }
-.sale-badge-gold { position: absolute; top: -10px; right: -20px; background: #FFD700; color: #E30613; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 1rem; padding: 10px 14px; border-radius: 4px; transform: rotate(12deg); box-shadow: 0 4px 12px rgba(255,215,0,0.5); z-index: 4; line-height: 1.1; text-align: center; }
-.sale-badge-gold span { display: block; font-size: 0.55rem; letter-spacing: 0.1em; color: #0a0a0a; font-weight: 600; }
-.sale-countdown { display: flex; align-items: center; gap: 6px; margin-top: 12px; }
-.countdown-block { display: flex; flex-direction: column; align-items: center; background: rgba(227,6,19,0.15); border: 1px solid rgba(227,6,19,0.4); border-radius: 3px; padding: 5px 9px; min-width: 48px; }
-.countdown-num { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 1.1rem; color: #fff; line-height: 1; }
-.countdown-label { font-family: 'Inter', sans-serif; font-size: 0.45rem; color: #E30613; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; font-weight: 600; }
-.countdown-sep { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 1.1rem; color: #FFD700; line-height: 1; align-self: flex-start; padding-top: 5px; animation: sepBlink 1s ease-in-out infinite; }
-@keyframes sepBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-@media (max-width: 640px) {
-.sale-sign-board { padding: 14px 28px 16px; min-width: 280px; } .sale-sign-title { font-size: 1.8rem; }
-.sale-rope-left { left: 28px; } .sale-rope-right { right: 28px; } .sale-rope-left, .sale-rope-right { height: 50px; }
-.sale-ribbon { margin-top: 45px; font-size: 0.75rem; padding: 6px 20px; } .sale-badge-gold { right: -10px; font-size: 0.85rem; padding: 8px 10px; }
-.countdown-block { min-width: 40px; padding: 4px 7px; } .countdown-num { font-size: 0.95rem; }
-}
-
-.sale-price-tag { display: inline-flex; align-items: center; gap: 8px; background: #E30613; color: #fff; padding: 4px 12px; border-radius: 2px; font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 0.95rem; }
-.sale-price-tag .old-price { text-decoration: line-through; color: rgba(255,255,255,0.7); font-size: 0.8em; font-weight: 400; }
-.sale-price-tag .new-price { color: #FFD700; font-weight: 700; }
-.graffiti-heading { text-align: center; margin-bottom: 3rem; position: relative; }
-.graffiti-heading .ribbon-label { display: inline-block; background: #E30613; color: #fff; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase; padding: 6px 24px; margin-bottom: 12px; transform: rotate(-1deg); }
-.graffiti-heading h2 { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: clamp(2rem, 5vw, 3.5rem); color: #0a0a0a; text-transform: uppercase; letter-spacing: 0.02em; line-height: 1; }
-.graffiti-heading h2 .accent { color: #E30613; }
-.graffiti-heading .desc { font-size: 0.85rem; color: #888; margin-top: 12px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.5; }
-.product-sale-badge { position: absolute; top: 12px; left: 12px; background: #E30613; color: #FFD700; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 0.7rem; padding: 5px 10px; letter-spacing: 0.05em; z-index: 3; transform: rotate(-3deg); box-shadow: 2px 2px 0 #0a0a0a; line-height: 1; }
-
 .hero-carousel { position: relative; width: 100%; height: 100vh; min-height: 600px; overflow: hidden; }
 .hero-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease; display: flex; align-items: center; justify-content: center; }
 .hero-slide.active { opacity: 1; z-index: 2; }
@@ -126,8 +85,7 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .product-card .quick-view { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%) translateY(10px); opacity: 0; background: #E30613; color: #FFD700; padding: 10px 24px; font-family: 'Oswald', sans-serif; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s ease; white-space: nowrap; }
 .product-card:hover .quick-view { opacity: 1; transform: translateX(-50%) translateY(0); }
 .product-card .product-name { font-size: 0.8rem; font-weight: 400; margin-bottom: 4px; line-height: 1.4; }
-.product-card .product-price { font-size: 0.8rem; font-weight: 500; color: #0a0a0a; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.product-card .product-price .alt-price { color: #888; font-size: 0.8em; font-weight: 400; }
+.product-card .product-price { font-size: 0.8rem; font-weight: 500; color: #0a0a0a; }
 .product-card:hover .add-btn { opacity: 1 !important; }
 .add-btn { background: #0a0a0a !important; color: #fff !important; font-family: 'Oswald', sans-serif; font-weight: 600; }
 .add-btn:hover { background: #E30613 !important; color: #FFD700 !important; }
@@ -162,8 +120,7 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .quick-view-img img { width: 100%; height: 100%; object-fit: cover; }
 .quick-view-info { padding: 40px; }
 .quick-view-info h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 0.5rem; }
-.quick-view-info .price { font-size: 1.1rem; font-weight: 500; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.quick-view-info .price .alt-price { color: #888; font-size: 0.85em; font-weight: 400; }
+.quick-view-info .price { font-size: 1.1rem; font-weight: 500; margin-bottom: 1.5rem; }
 .quick-view-info .desc { font-size: 0.85rem; color: #888; line-height: 1.6; margin-bottom: 1.5rem; }
 .quick-view-info .notes { font-size: 0.75rem; color: #888; margin-bottom: 2rem; }
 .add-to-cart-btn { width: 100%; padding: 16px; background: #E30613; color: #FFD700; border: none; font-family: 'Oswald', sans-serif; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: background 0.3s ease; }
@@ -179,8 +136,7 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .cart-item img { width: 80px; height: 100px; object-fit: cover; background: #f5f5f5; }
 .cart-item-info { flex: 1; }
 .cart-item-info h4 { font-size: 0.85rem; margin-bottom: 4px; }
-.cart-item-info .price { font-size: 0.8rem; font-weight: 500; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.cart-item-info .price .alt-price { color: #888; font-size: 0.85em; font-weight: 400; }
+.cart-item-info .price { font-size: 0.8rem; font-weight: 500; }
 .cart-qty { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
 .cart-qty button { width: 28px; height: 28px; border: 1px solid #e5e5e5; background: none; cursor: pointer; font-size: 0.8rem; }
 .cart-qty span { font-size: 0.8rem; min-width: 20px; text-align: center; }
@@ -247,7 +203,6 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .email-note i { color: #FFD700; margin-right: 6px; }
 @media (max-width: 480px) { .success-card { padding: 32px 20px; } .success-card h1 { font-size: 1.5rem; } }
 
-.mm-sale-accent { font-family: 'Oswald', sans-serif; color: #E30613; font-weight: 700; }
 .mm-step-badge { width: 36px; height: 36px; border-radius: 50%; background: #E30613; color: #FFD700; display: flex; align-items: center; justify-content: center; font-family: 'Oswald', sans-serif; font-size: 1rem; font-weight: 700; box-shadow: 2px 2px 0 #0a0a0a; transform: rotate(-3deg); }
 .mm-step-title { font-family: 'Oswald', sans-serif; font-size: 1.3rem; font-weight: 700; color: #0a0a0a; text-transform: uppercase; letter-spacing: 0.05em; }
 </style>
@@ -334,30 +289,6 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 </div>
 </div>
 
-<div class="sale-hanging-overlay">
-<div class="sale-swing-anchor">
-<div class="sale-rope-left"></div>
-<div class="sale-rope-right"></div>
-<div class="sale-ribbon">END OF</div>
-<div class="sale-sign-board">
-<div class="sale-badge-gold">20%<span>OFF</span></div>
-<div class="sale-sign-content">
-<div class="sale-sign-title">SUMMER <span class="sale-off">SALES</span></div>
-<div class="sale-sign-sub">On Selected Items • No Code Needed</div>
-<div class="sale-countdown" id="saleCountdown">
-<div class="countdown-block"><span class="countdown-num" id="cdDays">00</span><span class="countdown-label">Days</span></div>
-<span class="countdown-sep">:</span>
-<div class="countdown-block"><span class="countdown-num" id="cdHours">00</span><span class="countdown-label">Hrs</span></div>
-<span class="countdown-sep">:</span>
-<div class="countdown-block"><span class="countdown-num" id="cdMins">00</span><span class="countdown-label">Min</span></div>
-<span class="countdown-sep">:</span>
-<div class="countdown-block"><span class="countdown-num" id="cdSecs">00</span><span class="countdown-label">Sec</span></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-
 <div class="carousel-dots">
 <div class="carousel-dot active" onclick="goToSlide(0)"></div>
 <div class="carousel-dot" onclick="goToSlide(1)"></div>
@@ -367,10 +298,9 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 
 <section class="py-20 px-6" id="shop">
 <div class="max-w-7xl mx-auto">
-<div class="graffiti-heading">
-<span class="ribbon-label"><i class="fas fa-fire" style="margin-right:6px;"></i>Don't Miss Out</span>
-<h2>SHOP THE <span class="accent">SALE</span></h2>
-<p class="desc">20% off on selected items. Sales end 13th September.</p>
+<div class="section-heading">
+<p>Catalog</p>
+<h2>Shop All Products</h2>
 </div>
 <div class="product-grid" id="shopGrid"></div>
 </div>
@@ -378,10 +308,12 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 
 <section class="py-20 px-6" style="background:#ffffff; color:#0a0a0a;" id="mixmatch">
 <div class="max-w-7xl mx-auto">
-<div class="graffiti-heading" style="margin-bottom:3rem;">
-<span class="ribbon-label"><i class="fas fa-puzzle-piece" style="margin-right:6px;"></i>Build Your Own</span>
-<h2>MIX & <span class="accent">MATCH</span></h2>
-<p class="desc">Pick any two items and create your own bundle. <span class="mm-sale-accent">Sale price + 10% bundle discount = insane deal.</span></p>
+<div class="section-heading" style="margin-bottom:3rem;">
+<p style="color:#888;">Build Your Own</p>
+<h2 style="color:#0a0a0a;">Mix & Match</h2>
+<p style="font-size:0.85rem; color:#888; margin-top:12px; max-width:500px; margin-left:auto; margin-right:auto; line-height:1.6;">
+Pick any two items and create your own bundle. Mix a candle with a diffuser, or pair two candles — it's your choice. Save 10% when you bundle.
+</p>
 </div>
 <div id="mmStep1" style="margin-bottom:40px;">
 <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
@@ -406,7 +338,6 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 <div id="mmBundleItems" style="margin-bottom:24px;"></div>
 <div style="border-top:2px dashed #E30613; padding-top:20px;">
 <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.85rem; color:#888;"><span>Individual Total</span><span id="mmOriginalTotal" style="text-decoration:line-through;">₦0.00</span></div>
-<div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.85rem; font-family:'Oswald',sans-serif; font-weight:600;"><span style="color:#E30613;">Summer Sale (-20%)</span><span id="mmSaleDiscount" style="color:#E30613;">-0.00</span></div>
 <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.85rem; font-family:'Oswald',sans-serif; font-weight:600;"><span style="color:#4ade80;">Bundle Discount (-10%)</span><span id="mmDiscountAmount" style="color:#4ade80;">-0.00</span></div>
 <div style="display:flex; justify-content:space-between; font-size:1.3rem; font-weight:700; border-top:2px solid #0a0a0a; padding-top:12px; font-family:'Oswald',sans-serif;"><span>Bundle Total</span><span id="mmBundleTotal" style="color:#E30613;">₦0.00</span></div>
 </div>
@@ -620,28 +551,21 @@ function safeSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {}
 function safeRemove(key) { try { localStorage.removeItem(key); } catch(e) {} }
 
 const ADMIN_EMAIL = 'bxclubhq@gmail.com';
-const SALE_ACTIVE = true;
-const SALE_DISCOUNT_PERCENT = 20;
-
-let targetYear = new Date().getFullYear();
-let saleEndDate = new Date(targetYear, 8, 13, 23, 59, 59);
-if (saleEndDate.getTime() < Date.now()) { saleEndDate = new Date(targetYear + 1, 8, 13, 23, 59, 59); }
-const SALE_END_DATE = saleEndDate.getTime();
 
 const countryCurrencyMap = { 'NG': 'NGN', 'GB': 'GBP', 'US': 'USD', 'EU': 'EUR', 'CA': 'CAD', 'AU': 'AUD', 'ZA': 'ZAR', 'GH': 'GHS', 'KE': 'KES', 'IN': 'INR', 'JP': 'JPY', 'CN': 'CNY', 'FR': 'EUR', 'DE': 'EUR', 'IT': 'EUR', 'ES': 'EUR' };
 const currencySymbols = { 'NGN': '₦', 'GBP': '£', 'USD': '$', 'EUR': '€', 'ZAR': 'R', 'GHS': '₵', 'KES': 'KSh', 'INR': '₹', 'JPY': '¥', 'CNY': '¥', 'CAD': 'C$', 'AUD': 'A$' };
 const FALLBACK_CURRENCY = 'USD';
 
 const products = [
-{ id: 1, name: "BX CLUB Candle — Summer in London", shortName: "Candle — Summer in London", collection: "summer", type: "candle", priceNGN: 54000, priceGBP: 30, salePriceNGN: 43200, salePriceGBP: 24, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781517668/05a944f8-5de4-4e7f-bc2c-2d58086e4c71_iwpcme.png", description: "A fruity gourmand fragrance inspired by summer in London.", notes: ["Black Cherry", "Raspberry", "Vanilla"] },
-{ id: 2, name: "BX CLUB Candle — Midnight in Lagos", shortName: "Candle — Midnight in Lagos", collection: "midnight", type: "candle", priceNGN: 54000, priceGBP: 30, salePriceNGN: 43200, salePriceGBP: 24, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781571548/bcaaea51-cf78-4962-9929-afb4665ea903_mwftya.png", description: "A woody leather candle inspired by Lagos nights.", notes: ["Plum", "Leather", "Sandalwood"] },
-{ id: 3, name: "BX CLUB Diffuser — Summer in London", shortName: "Diffuser — Summer in London", collection: "summer", type: "diffuser", priceNGN: 54000, priceGBP: 30, salePriceNGN: 43200, salePriceGBP: 24, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781519410/e64c5794-56a4-4a2d-a66a-3a3e57d8d34a_lltpuq.png", description: "A fruity gourmand diffuser inspired by summer in London.", notes: ["Black Cherry", "Raspberry", "Vanilla"] },
-{ id: 4, name: "BX CLUB Diffuser — Midnight in Lagos", shortName: "Diffuser — Midnight in Lagos", collection: "midnight", type: "diffuser", priceNGN: 54000, priceGBP: 30, salePriceNGN: 43200, salePriceGBP: 24, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781519609/6dcc16c1-d477-4b03-9868-792ff0fa46c4_hmqnab.png", description: "A woody leather diffuser inspired by Lagos nights.", notes: ["Plum", "Leather", "Sandalwood"] },
+{ id: 1, name: "BX CLUB Candle — Summer in London", shortName: "Candle — Summer in London", collection: "summer", type: "candle", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781517668/05a944f8-5de4-4e7f-bc2c-2d58086e4c71_iwpcme.png", description: "A fruity gourmand fragrance inspired by summer in London.", notes: ["Black Cherry", "Raspberry", "Vanilla"] },
+{ id: 2, name: "BX CLUB Candle — Midnight in Lagos", shortName: "Candle — Midnight in Lagos", collection: "midnight", type: "candle", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781571548/bcaaea51-cf78-4962-9929-afb4665ea903_mwftya.png", description: "A woody leather candle inspired by Lagos nights.", notes: ["Plum", "Leather", "Sandalwood"] },
+{ id: 3, name: "BX CLUB Diffuser — Summer in London", shortName: "Diffuser — Summer in London", collection: "summer", type: "diffuser", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781519410/e64c5794-56a4-4a2d-a66a-3a3e57d8d34a_lltpuq.png", description: "A fruity gourmand diffuser inspired by summer in London.", notes: ["Black Cherry", "Raspberry", "Vanilla"] },
+{ id: 4, name: "BX CLUB Diffuser — Midnight in Lagos", shortName: "Diffuser — Midnight in Lagos", collection: "midnight", type: "diffuser", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781519609/6dcc16c1-d477-4b03-9868-792ff0fa46c4_hmqnab.png", description: "A woody leather diffuser inspired by Lagos nights.", notes: ["Plum", "Leather", "Sandalwood"] },
 ];
 const singleProducts = [
-{ id: 101, name: "BX CLUB — Summer in London Collection", shortName: "Summer in London Set", collection: "summer", type: "set", priceNGN: 135000, priceGBP: 75, salePriceNGN: 108000, salePriceGBP: 60, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1784329241/ChatGPT_Image_Jul_17_2026_04_00_18_PM_ajutoz.png", description: "The complete Summer in London collection.", notes: ["Candle", "Diffuser", "Instruments"] },
-{ id: 102, name: "BX CLUB — Midnight in Lagos Collection", shortName: "Midnight in Lagos Set", collection: "midnight", type: "set", priceNGN: 135000, priceGBP: 75, salePriceNGN: 108000, salePriceGBP: 60, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1784328986/ChatGPT_Image_Jul_17_2026_03_42_18_PM_gggxg8.png", description: "The complete Midnight in Lagos collection.", notes: ["Candle", "Diffuser", "Instruments"] },
-{ id: 105, name: "BX CLUB Instruments of Flame", shortName: "Instruments of Flame", collection: "accessories", type: "accessories", priceNGN: 36000, priceGBP: 20, salePriceNGN: 28800, salePriceGBP: 16, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781519239/53ccd5ce-71e8-4b6f-ba12-646bfb8949f4_em3liv.png", description: "Essential tools for the discerning luminary owner.", notes: ["Trimmer", "Dipper", "Snuffer", "Tray"] }
+{ id: 101, name: "BX CLUB — Summer in London Collection", shortName: "Summer in London Set", collection: "summer", type: "set", priceNGN: 135000, priceGBP: 75, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1784329241/ChatGPT_Image_Jul_17_2026_04_00_18_PM_ajutoz.png", description: "The complete Summer in London collection.", notes: ["Candle", "Diffuser", "Instruments"] },
+{ id: 102, name: "BX CLUB — Midnight in Lagos Collection", shortName: "Midnight in Lagos Set", collection: "midnight", type: "set", priceNGN: 135000, priceGBP: 75, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1784328986/ChatGPT_Image_Jul_17_2026_03_42_18_PM_gggxg8.png", description: "The complete Midnight in Lagos collection.", notes: ["Candle", "Diffuser", "Instruments"] },
+{ id: 105, name: "BX CLUB Instruments of Flame", shortName: "Instruments of Flame", collection: "accessories", type: "accessories", priceNGN: 36000, priceGBP: 20, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781519239/53ccd5ce-71e8-4b6f-ba12-646bfb8949f4_em3liv.png", description: "Essential tools for the discerning luminary owner.", notes: ["Trimmer", "Dipper", "Snuffer", "Tray"] }
 ];
 const faqs = [
 { q: "How long do your candles burn?", a: "Our candles burn for 55-80 hours." },
@@ -664,72 +588,6 @@ let autoDetectedCurrency = null;
 let isCurrencyManuallyChanged = safeGet('bxclub_manual_currency') === 'true';
 const SHIPPING_NIGERIA_NGN = 5000;
 const SHIPPING_UK_GBP = 3.99;
-
-function updateCountdown() {
-const now = Date.now(); const diff = SALE_END_DATE - now;
-if (diff <= 0) { ['cdDays','cdHours','cdMins','cdSecs'].forEach(id => document.getElementById(id).textContent = '00'); return; }
-const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-const secs = Math.floor((diff % (1000 * 60)) / 1000);
-document.getElementById('cdDays').textContent = String(days).padStart(2, '0');
-document.getElementById('cdHours').textContent = String(hours).padStart(2, '0');
-document.getElementById('cdMins').textContent = String(mins).padStart(2, '0');
-document.getElementById('cdSecs').textContent = String(secs).padStart(2, '0');
-}
-updateCountdown(); setInterval(updateCountdown, 1000);
-
-function getProductPrice(product) {
-    const hasSalePrice = product.salePriceGBP !== undefined;
-    const effectivePriceGBP = hasSalePrice ? product.salePriceGBP : product.priceGBP;
-    const effectivePriceNGN = hasSalePrice ? product.salePriceNGN : product.priceNGN;
-    const originalPriceGBP = product.priceGBP;
-    const originalPriceNGN = product.priceNGN;
-    if (currentCurrency === 'GBP') return { price: effectivePriceGBP, originalPrice: originalPriceGBP, symbol: '£' };
-    if (currentCurrency === 'NGN') return { price: effectivePriceNGN, originalPrice: originalPriceNGN, symbol: '₦' };
-    const rate = exchangeRates[currentCurrency];
-    if (rate) return { price: Math.round(effectivePriceGBP * rate), originalPrice: Math.round(originalPriceGBP * rate), symbol: currencySymbols[currentCurrency] || currentCurrency };
-    return { price: effectivePriceGBP, originalPrice: originalPriceGBP, symbol: '£' };
-}
-
-function getCartItemPrice(item) {
-    const hasSalePrice = item.salePriceGBP !== undefined;
-    const effectivePriceGBP = hasSalePrice ? item.salePriceGBP : item.priceGBP;
-    const effectivePriceNGN = hasSalePrice ? item.salePriceNGN : item.priceNGN;
-    if (item.isBundle) {
-        if (currentCurrency === 'NGN') return { price: item.priceNGN, symbol: '₦' };
-        if (currentCurrency === 'GBP') return { price: item.priceGBP, symbol: '£' };
-        return { price: item.priceGBP, symbol: '£' };
-    }
-    if (currentCurrency === 'GBP') return { price: effectivePriceGBP, symbol: '£' };
-    if (currentCurrency === 'NGN') return { price: effectivePriceNGN, symbol: '₦' };
-    const rate = exchangeRates[currentCurrency];
-    if (rate) return { price: Math.round(effectivePriceGBP * rate), symbol: currencySymbols[currentCurrency] || currentCurrency };
-    return { price: effectivePriceGBP, symbol: '£' };
-}
-
-async function detectCurrencyFromIP() {
-const loader = document.getElementById('currencyLoader'); const loaderText = document.getElementById('currencyLoaderText');
-if (isCurrencyManuallyChanged) return;
-try {
-loader.classList.add('show'); loaderText.textContent = 'Detecting your location...';
-let geoData = null;
-try { const r = await fetch('https://ipapi.co/json/'); if (r.ok) geoData = await r.json(); } catch(e) {}
-if (!geoData) { try { const r = await fetch('https://ipwho.is/'); if (r.ok) { const d = await r.json(); if (d.success !== false) geoData = { country_code: d.country_code, country_name: d.country }; } } catch(e) {} }
-if (!geoData || !geoData.country_code) throw new Error('geo failed');
-detectedCountry = geoData.country_code;
-const countryName = geoData.country_name || detectedCountry;
-autoDetectedCurrency = countryCurrencyMap[detectedCountry] || FALLBACK_CURRENCY;
-if (detectedCountry === 'NG') autoDetectedCurrency = 'NGN';
-if (detectedCountry === 'GB') autoDetectedCurrency = 'GBP';
-currentCurrency = autoDetectedCurrency;
-safeSet('bxclub_currency', currentCurrency);
-const symbol = currencySymbols[currentCurrency] || currentCurrency;
-loaderText.textContent = 'Prices shown in ' + currentCurrency;
-setTimeout(() => { loader.classList.remove('show'); showToast('Welcome from ' + countryName + '! Prices in ' + symbol); }, 1500);
-} catch (error) { console.error('Currency detection failed:', error); loader.classList.remove('show'); } 
-finally { updateCurrencyButtons(); renderProducts(); updateCartUI(); renderMixMatchGrid1(); renderMixMatchGrid2(); if (mmSelected1 && mmSelected2) showBundleSummary(); }
-}
 
 let currentSlide = 0;
 const slides = document.querySelectorAll('.hero-slide'); const dots = document.querySelectorAll('.carousel-dot'); let carouselInterval;
@@ -758,15 +616,14 @@ function updateCurrencyButtons() { ['currencyBtn', 'currencyBtnMobile', 'cartCur
 
 function renderProductCard(product) {
 const info = getProductPrice(product);
-const saleBadge = SALE_ACTIVE ? '<div class="product-sale-badge">20% OFF</div>' : '';
 return '<div class="product-card">' +
-'<div class="product-img-wrap" onclick="openQuickView(' + product.id + ')">' + saleBadge +
+'<div class="product-img-wrap" onclick="openQuickView(' + product.id + ')">' +
 '<img src="' + product.image + '" alt="' + product.shortName + '" loading="lazy">' +
 '<button class="quick-view" onclick="event.stopPropagation(); openQuickView(' + product.id + ')">Quick View</button>' +
 '</div>' +
 '<div onclick="openQuickView(' + product.id + ')" style="cursor:pointer;">' +
 '<h3 class="product-name">' + product.shortName + '</h3>' +
-'<div class="sale-price-tag"><span class="old-price">' + info.symbol + formatPrice(info.originalPrice) + '</span><span class="new-price">' + info.symbol + formatPrice(info.price) + '</span></div>' +
+'<p class="product-price">' + info.symbol + formatPrice(info.price) + '</p>' +
 '</div>' +
 '<button onclick="addToCart(' + product.id + ', 1)" style="width:100%;margin-top:10px;padding:10px;background:#0a0a0a;color:#fff;border:none;font-family:\'Oswald\',sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;opacity:0;transition:opacity 0.3s ease;" class="add-btn">Add to Cart</button>' +
 '</div>';
@@ -784,6 +641,50 @@ document.getElementById('shop').scrollIntoView({ behavior: 'smooth' });
 showToast('Showing ' + (collection === 'summer' ? 'Summer in London' : 'Midnight in Lagos'));
 }
 
+function getProductPrice(product) {
+    if (currentCurrency === 'GBP') return { price: product.priceGBP, symbol: '£' };
+    if (currentCurrency === 'NGN') return { price: product.priceNGN, symbol: '₦' };
+    const rate = exchangeRates[currentCurrency];
+    if (rate) return { price: Math.round(product.priceGBP * rate), symbol: currencySymbols[currentCurrency] || currentCurrency };
+    return { price: product.priceGBP, symbol: '£' };
+}
+
+function getCartItemPrice(item) {
+    if (item.isBundle) {
+        if (currentCurrency === 'NGN') return { price: item.priceNGN, symbol: '₦' };
+        if (currentCurrency === 'GBP') return { price: item.priceGBP, symbol: '£' };
+        return { price: item.priceGBP, symbol: '£' };
+    }
+    if (currentCurrency === 'GBP') return { price: item.priceGBP, symbol: '£' };
+    if (currentCurrency === 'NGN') return { price: item.priceNGN, symbol: '₦' };
+    const rate = exchangeRates[currentCurrency];
+    if (rate) return { price: Math.round(item.priceGBP * rate), symbol: currencySymbols[currentCurrency] || currentCurrency };
+    return { price: item.priceGBP, symbol: '£' };
+}
+
+async function detectCurrencyFromIP() {
+const loader = document.getElementById('currencyLoader'); const loaderText = document.getElementById('currencyLoaderText');
+if (isCurrencyManuallyChanged) return;
+try {
+loader.classList.add('show'); loaderText.textContent = 'Detecting your location...';
+let geoData = null;
+try { const r = await fetch('https://ipapi.co/json/'); if (r.ok) geoData = await r.json(); } catch(e) {}
+if (!geoData) { try { const r = await fetch('https://ipwho.is/'); if (r.ok) { const d = await r.json(); if (d.success !== false) geoData = { country_code: d.country_code, country_name: d.country }; } } catch(e) {} }
+if (!geoData || !geoData.country_code) throw new Error('geo failed');
+detectedCountry = geoData.country_code;
+const countryName = geoData.country_name || detectedCountry;
+autoDetectedCurrency = countryCurrencyMap[detectedCountry] || FALLBACK_CURRENCY;
+if (detectedCountry === 'NG') autoDetectedCurrency = 'NGN';
+if (detectedCountry === 'GB') autoDetectedCurrency = 'GBP';
+currentCurrency = autoDetectedCurrency;
+safeSet('bxclub_currency', currentCurrency);
+const symbol = currencySymbols[currentCurrency] || currentCurrency;
+loaderText.textContent = 'Prices shown in ' + currentCurrency;
+setTimeout(() => { loader.classList.remove('show'); showToast('Welcome from ' + countryName + '! Prices in ' + symbol); }, 1500);
+} catch (error) { console.error('Currency detection failed:', error); loader.classList.remove('show'); } 
+finally { updateCurrencyButtons(); renderProducts(); updateCartUI(); renderMixMatchGrid1(); renderMixMatchGrid2(); if (mmSelected1 && mmSelected2) showBundleSummary(); }
+}
+
 function getCartSubtotal() { return cart.reduce((sum, item) => sum + (getCartItemPrice(item).price * item.quantity), 0); }
 function convertFromGBP(amount) { if (currentCurrency === 'GBP') return { price: amount, symbol: '£' }; if (currentCurrency === 'NGN') return { price: Math.round(amount * (exchangeRates['NGN'] || 1800)), symbol: '₦' }; return { price: amount, symbol: '£' }; }
 function convertFromNGN(amount) { if (currentCurrency === 'NGN') return { price: amount, symbol: '' }; const ngnRate = exchangeRates['NGN'] || 1800; const gbpAmount = amount / ngnRate; if (currentCurrency === 'GBP') return { price: Math.round(gbpAmount * 100) / 100, symbol: '£' }; return { price: Math.round(gbpAmount * 100) / 100, symbol: '£' }; }
@@ -793,7 +694,7 @@ function openQuickView(productId) {
 const product = [...products, ...singleProducts].find(p => p.id === productId); if(!product) return;
 currentQVProduct = product; qvQty = 1; const info = getProductPrice(product);
 document.getElementById('qvImage').src = product.image; document.getElementById('qvName').textContent = product.name;
-document.getElementById('qvPrice').innerHTML = '<div class="sale-price-tag" style="font-size:1rem;"><span class="old-price">' + info.symbol + formatPrice(info.originalPrice) + '</span><span class="new-price">' + info.symbol + formatPrice(info.price) + '</span></div>';
+document.getElementById('qvPrice').textContent = info.symbol + formatPrice(info.price);
 document.getElementById('qvDesc').textContent = product.description; document.getElementById('qvNotes').textContent = 'Notes: ' + product.notes.join(', ');
 document.getElementById('qvQty').textContent = qvQty; document.getElementById('quickViewModal').classList.add('active'); document.body.style.overflow = 'hidden';
 }
@@ -805,7 +706,7 @@ function addToCart(productId, qty) {
 const product = [...products, ...singleProducts].find(p => p.id === productId); if(!product) return;
 const existing = cart.find(item => item.id === productId);
 if(existing) existing.quantity += qty;
-else cart.push({ id: product.id, name: product.name, shortName: product.shortName, image: product.image, priceNGN: product.priceNGN, priceGBP: product.priceGBP, salePriceNGN: product.salePriceNGN, salePriceGBP: product.salePriceGBP, quantity: qty });
+else cart.push({ id: product.id, name: product.name, shortName: product.shortName, image: product.image, priceNGN: product.priceNGN, priceGBP: product.priceGBP, quantity: qty });
 saveCart(); updateCartUI(); showToast(product.shortName + ' added to cart');
 }
 function removeFromCart(productId) { cart = cart.filter(item => item.id !== productId); saveCart(); updateCartUI(); }
@@ -822,9 +723,9 @@ body.innerHTML = cart.map(item => {
 const info = getCartItemPrice(item);
 if (item.isBundle && item.bundleItems) {
 const bundleImages = item.bundleItems.map((bi, idx) => '<img src="' + bi.image + '" style="width:40px;height:50px;object-fit:cover;background:#f5f5f5;' + (idx > 0 ? 'margin-left:-12px;border:2px solid #fff;' : '') + '">' ).join('');
-return '<div class="cart-item"><div style="display:flex;align-items:center;">' + bundleImages + '</div><div class="cart-item-info"><h4>' + item.name + '</h4><p class="price"><span style="color:#E30613;font-family:\'Oswald\',sans-serif;font-weight:700;">' + info.symbol + formatPrice(info.price) + '</span></p><button class="remove-item" onclick="removeFromCart(' + item.id + ')">Remove</button></div></div>';
+return '<div class="cart-item"><div style="display:flex;align-items:center;">' + bundleImages + '</div><div class="cart-item-info"><h4>' + item.name + '</h4><p class="price">' + info.symbol + formatPrice(info.price) + '</p><button class="remove-item" onclick="removeFromCart(' + item.id + ')">Remove</button></div></div>';
 }
-return '<div class="cart-item"><img src="' + item.image + '" alt="' + item.shortName + '"><div class="cart-item-info"><h4>' + item.name + '</h4><div class="sale-price-tag" style="margin-bottom:4px;font-size:0.8rem;"><span class="new-price">' + info.symbol + formatPrice(info.price) + '</span></div><div class="cart-qty"><button onclick="updateCartQty(' + item.id + ', -1)">−</button><span>' + item.quantity + '</span><button onclick="updateCartQty(' + item.id + ', 1)">+</button></div><button class="remove-item" onclick="removeFromCart(' + item.id + ')">Remove</button></div></div>';
+return '<div class="cart-item"><img src="' + item.image + '" alt="' + item.shortName + '"><div class="cart-item-info"><h4>' + item.name + '</h4><p class="price">' + info.symbol + formatPrice(info.price) + '</p><div class="cart-qty"><button onclick="updateCartQty(' + item.id + ', -1)">−</button><span>' + item.quantity + '</span><button onclick="updateCartQty(' + item.id + ', 1)">+</button></div><button class="remove-item" onclick="removeFromCart(' + item.id + ')">Remove</button></div></div>';
 }).join('');
 const symbol = currencySymbols[currentCurrency] || currentCurrency; const subtotal = getCartSubtotal();
 document.getElementById('cartSubtotal').textContent = symbol + formatPrice(subtotal);
@@ -903,7 +804,6 @@ async function placeOrder(e) {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Redirecting to Stripe...';
 
     try {
-        // 1. Save order to localStorage immediately as "pending"
         const orderDetails = {
             txRef: txRef, items: cart,
             customer: { firstName, lastName, email, phone, address, city, country, postal },
@@ -916,7 +816,6 @@ async function placeOrder(e) {
         safeSet('bxclub_orders', JSON.stringify(orders));
         window.dispatchEvent(new StorageEvent('storage', { key: 'bxclub_orders', newValue: JSON.stringify(orders) }));
 
-        // 2. Send cart to Vercel Backend to create Stripe Checkout
         const response = await fetch('/api/checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -936,7 +835,6 @@ async function placeOrder(e) {
 
         if (data.url) {
             showToast('Redirecting to secure payment...');
-            // 3. Redirect user to Stripe's secure hosted page
             window.location.href = data.url;
         } else {
             throw new Error(data.error || 'Failed to create checkout session');
@@ -970,31 +868,31 @@ document.addEventListener('keydown', (e) => { if(e.key === 'Escape') { closeQuic
 
 let mmSelected1 = null; let mmSelected2 = null; const MM_DISCOUNT_PERCENT = 10;
 const mmEligibleProducts = products.filter(p => p.type === 'candle' || p.type === 'diffuser');
-function renderMixMatchGrid1() { const grid = document.getElementById('mmGrid1'); if (!grid) return; grid.innerHTML = mmEligibleProducts.map(p => { const info = getProductPrice(p); const isSelected = mmSelected1 && mmSelected1.id === p.id; const saleBadge = SALE_ACTIVE ? '<div class="product-sale-badge">20% OFF</div>' : ''; return '<div class="product-card" style="' + (isSelected ? 'outline:2px solid #E30613; outline-offset:4px;' : '') + '" onclick="selectMM1(' + p.id + ')"><div class="product-img-wrap" style="background:#f5f5f5;">' + saleBadge + '<img src="' + p.image + '" alt="' + p.shortName + '" loading="lazy">' + (isSelected ? '<div style="position:absolute;inset:0;background:rgba(227,6,19,0.1);display:flex;align-items:center;justify-content:center;"><span style="background:#E30613;color:#FFD700;padding:8px 16px;font-family:\'Oswald\',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Selected</span></div>' : '') + '</div><div style="cursor:pointer; padding-top:12px;"><h3 class="product-name" style="color:#0a0a0a;">' + p.shortName + '</h3><div class="sale-price-tag"><span class="old-price">' + info.symbol + formatPrice(info.originalPrice) + '</span><span class="new-price">' + info.symbol + formatPrice(info.price) + '</span></div></div></div>'; }).join(''); }
-function renderMixMatchGrid2() { const grid = document.getElementById('mmGrid2'); if (!grid) return; const available = mmEligibleProducts.filter(p => !mmSelected1 || p.id !== mmSelected1.id); grid.innerHTML = available.map(p => { const info = getProductPrice(p); const isSelected = mmSelected2 && mmSelected2.id === p.id; const saleBadge = SALE_ACTIVE ? '<div class="product-sale-badge">20% OFF</div>' : ''; return '<div class="product-card" style="' + (isSelected ? 'outline:2px solid #E30613; outline-offset:4px;' : '') + '" onclick="selectMM2(' + p.id + ')"><div class="product-img-wrap" style="background:#f5f5f5;">' + saleBadge + '<img src="' + p.image + '" alt="' + p.shortName + '" loading="lazy">' + (isSelected ? '<div style="position:absolute;inset:0;background:rgba(227,6,19,0.1);display:flex;align-items:center;justify-content:center;"><span style="background:#E30613;color:#FFD700;padding:8px 16px;font-family:\'Oswald\',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Selected</span></div>' : '') + '</div><div style="cursor:pointer; padding-top:12px;"><h3 class="product-name" style="color:#0a0a0a;">' + p.shortName + '</h3><div class="sale-price-tag"><span class="old-price">' + info.symbol + formatPrice(info.originalPrice) + '</span><span class="new-price">' + info.symbol + formatPrice(info.price) + '</span></div></div></div>'; }).join(''); }
+function renderMixMatchGrid1() { const grid = document.getElementById('mmGrid1'); if (!grid) return; grid.innerHTML = mmEligibleProducts.map(p => { const info = getProductPrice(p); const isSelected = mmSelected1 && mmSelected1.id === p.id; return '<div class="product-card" style="' + (isSelected ? 'outline:2px solid #E30613; outline-offset:4px;' : '') + '" onclick="selectMM1(' + p.id + ')"><div class="product-img-wrap" style="background:#f5f5f5;"><img src="' + p.image + '" alt="' + p.shortName + '" loading="lazy">' + (isSelected ? '<div style="position:absolute;inset:0;background:rgba(227,6,19,0.1);display:flex;align-items:center;justify-content:center;"><span style="background:#E30613;color:#FFD700;padding:8px 16px;font-family:\'Oswald\',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Selected</span></div>' : '') + '</div><div style="cursor:pointer; padding-top:12px;"><h3 class="product-name" style="color:#0a0a0a;">' + p.shortName + '</h3><p class="product-price">' + info.symbol + formatPrice(info.price) + '</p></div></div>'; }).join(''); }
+function renderMixMatchGrid2() { const grid = document.getElementById('mmGrid2'); if (!grid) return; const available = mmEligibleProducts.filter(p => !mmSelected1 || p.id !== mmSelected1.id); grid.innerHTML = available.map(p => { const info = getProductPrice(p); const isSelected = mmSelected2 && mmSelected2.id === p.id; return '<div class="product-card" style="' + (isSelected ? 'outline:2px solid #E30613; outline-offset:4px;' : '') + '" onclick="selectMM2(' + p.id + ')"><div class="product-img-wrap" style="background:#f5f5f5;"><img src="' + p.image + '" alt="' + p.shortName + '" loading="lazy">' + (isSelected ? '<div style="position:absolute;inset:0;background:rgba(227,6,19,0.1);display:flex;align-items:center;justify-content:center;"><span style="background:#E30613;color:#FFD700;padding:8px 16px;font-family:\'Oswald\',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Selected</span></div>' : '') + '</div><div style="cursor:pointer; padding-top:12px;"><h3 class="product-name" style="color:#0a0a0a;">' + p.shortName + '</h3><p class="product-price">' + info.symbol + formatPrice(info.price) + '</p></div></div>'; }).join(''); }
 function selectMM1(productId) { mmSelected1 = mmEligibleProducts.find(p => p.id === productId); mmSelected2 = null; renderMixMatchGrid1(); document.getElementById('mmStep2').style.display = 'block'; document.getElementById('mmStep3').style.display = 'none'; setTimeout(() => document.getElementById('mmStep2').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100); renderMixMatchGrid2(); }
 function selectMM2(productId) { mmSelected2 = mmEligibleProducts.find(p => p.id === productId); renderMixMatchGrid2(); showBundleSummary(); }
 function showBundleSummary() {
 if (!mmSelected1 || !mmSelected2) return;
 const info1 = getProductPrice(mmSelected1); const info2 = getProductPrice(mmSelected2); const symbol = info1.symbol;
-const salePrice1 = info1.price; const salePrice2 = info2.price; const originalPrice1 = info1.originalPrice; const originalPrice2 = info2.originalPrice;
-const regularTotal = originalPrice1 + originalPrice2; const afterSaleTotal = salePrice1 + salePrice2; const saleSavings = regularTotal - afterSaleTotal;
-const bundleDiscount = Math.round(afterSaleTotal * (MM_DISCOUNT_PERCENT / 100)); const bundleTotal = afterSaleTotal - bundleDiscount;
-document.getElementById('mmBundleItems').innerHTML = '<div style="display:flex; gap:16px; margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid #e5e5e5;"><img src="' + mmSelected1.image + '" style="width:80px; height:100px; object-fit:cover; background:#fff;"><div style="flex:1;"><h4 style="font-size:0.9rem; margin-bottom:4px; color:#0a0a0a;">' + mmSelected1.name + '</h4><div class="sale-price-tag" style="font-size:0.8rem;"><span class="old-price">' + symbol + formatPrice(originalPrice1) + '</span><span class="new-price">' + symbol + formatPrice(salePrice1) + '</span></div></div></div><div style="display:flex; gap:16px;"><img src="' + mmSelected2.image + '" style="width:80px; height:100px; object-fit:cover; background:#fff;"><div style="flex:1;"><h4 style="font-size:0.9rem; margin-bottom:4px; color:#0a0a0a;">' + mmSelected2.name + '</h4><div class="sale-price-tag" style="font-size:0.8rem;"><span class="old-price">' + symbol + formatPrice(originalPrice2) + '</span><span class="new-price">' + symbol + formatPrice(salePrice2) + '</span></div></div></div>';
-document.getElementById('mmOriginalTotal').textContent = symbol + formatPrice(regularTotal); document.getElementById('mmSaleDiscount').textContent = '-' + symbol + formatPrice(saleSavings); document.getElementById('mmDiscountAmount').textContent = '-' + symbol + formatPrice(bundleDiscount); document.getElementById('mmBundleTotal').textContent = symbol + formatPrice(bundleTotal);
+const price1 = info1.price; const price2 = info2.price;
+const originalTotal = price1 + price2;
+const bundleDiscount = Math.round(originalTotal * (MM_DISCOUNT_PERCENT / 100)); const bundleTotal = originalTotal - bundleDiscount;
+document.getElementById('mmBundleItems').innerHTML = '<div style="display:flex; gap:16px; margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid #e5e5e5;"><img src="' + mmSelected1.image + '" style="width:80px; height:100px; object-fit:cover; background:#fff;"><div style="flex:1;"><h4 style="font-size:0.9rem; margin-bottom:4px; color:#0a0a0a;">' + mmSelected1.name + '</h4><p style="font-size:0.8rem; color:#888;">' + symbol + formatPrice(price1) + '</p></div></div><div style="display:flex; gap:16px;"><img src="' + mmSelected2.image + '" style="width:80px; height:100px; object-fit:cover; background:#fff;"><div style="flex:1;"><h4 style="font-size:0.9rem; margin-bottom:4px; color:#0a0a0a;">' + mmSelected2.name + '</h4><p style="font-size:0.8rem; color:#888;">' + symbol + formatPrice(price2) + '</p></div></div>';
+document.getElementById('mmOriginalTotal').textContent = symbol + formatPrice(originalTotal); document.getElementById('mmDiscountAmount').textContent = '-' + symbol + formatPrice(bundleDiscount); document.getElementById('mmBundleTotal').textContent = symbol + formatPrice(bundleTotal);
 document.getElementById('mmStep3').style.display = 'block'; setTimeout(() => document.getElementById('mmStep3').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
 }
 function addBundleToCart() {
 if (!mmSelected1 || !mmSelected2) return;
 const info1 = getProductPrice(mmSelected1); const info2 = getProductPrice(mmSelected2);
-const salePrice1 = info1.price; const salePrice2 = info2.price; const afterSaleTotal = salePrice1 + salePrice2;
-const bundleDiscount = Math.round(afterSaleTotal * (MM_DISCOUNT_PERCENT / 100)); const bundleTotal = afterSaleTotal - bundleDiscount; const symbol = info1.symbol;
+const price1 = info1.price; const price2 = info2.price; const originalTotal = price1 + price2;
+const bundleDiscount = Math.round(originalTotal * (MM_DISCOUNT_PERCENT / 100)); const bundleTotal = originalTotal - bundleDiscount; const symbol = info1.symbol;
 let priceNGN, priceGBP;
 if (currentCurrency === 'NGN') { priceNGN = bundleTotal; priceGBP = Math.round((bundleTotal / (exchangeRates['NGN'] || 1800)) * 100) / 100; } 
 else if (currentCurrency === 'GBP') { priceGBP = bundleTotal; priceNGN = Math.round(bundleTotal * (exchangeRates['NGN'] || 1800)); } 
 else { const rate = exchangeRates[currentCurrency] || 1; priceGBP = Math.round((bundleTotal / rate) * 100) / 100; priceNGN = Math.round(priceGBP * (exchangeRates['NGN'] || 1800)); }
 const bundleProduct = { id: 999000 + Date.now(), name: 'Mix & Match Bundle', shortName: 'Mix & Match Bundle', image: mmSelected1.image, priceNGN, priceGBP, quantity: 1, bundleItems: [{ name: mmSelected1.shortName, image: mmSelected1.image }, { name: mmSelected2.shortName, image: mmSelected2.image }], isBundle: true };
-cart.push(bundleProduct); saveCart(); updateCartUI(); showToast('Bundle added! You saved ' + symbol + formatPrice(bundleDiscount + (info1.originalPrice + info2.originalPrice - afterSaleTotal))); resetMixMatch(); setTimeout(() => toggleCart(), 500);
+cart.push(bundleProduct); saveCart(); updateCartUI(); showToast('Bundle added! You saved ' + symbol + formatPrice(bundleDiscount)); resetMixMatch(); setTimeout(() => toggleCart(), 500);
 }
 function resetMixMatch() { mmSelected1 = null; mmSelected2 = null; document.getElementById('mmStep2').style.display = 'none'; document.getElementById('mmStep3').style.display = 'none'; renderMixMatchGrid1(); }
 
