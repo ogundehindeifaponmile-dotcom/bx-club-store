@@ -1,9 +1,8 @@
 {
-  "name": "bx-club-checkout",
+  "name": "bx-club-store",
   "version": "1.0.0",
   "dependencies": {
     "stripe": "^14.0.0",
-    "cors": "^2.8.5",
-    "resend": "^3.2.0"
+    "resend": "^2.0.0"
   }
 }
