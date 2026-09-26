@@ -37,8 +37,25 @@ export default async function handler(req, res) {
       cancel_url: `${req.headers.origin || 'https://bxclubhq.com'}?canceled=true`,
     });
 
-    // SAVE ORDER TO UPSTASH (Using the new Vercel variable names)
-    const orderData = { txRef, items, customer, amount, currency, status: 'pending', timestamp: new Date().toISOString() };
+    // SAVE FULL ORDER WITH DELIVERY DETAILS
+    const orderData = { 
+      txRef, 
+      items, 
+      customer: {
+        firstName: customer.firstName,
+        lastName: customer.lastName,
+        email: customer.email,
+        phone: customer.phone,
+        address: customer.address,
+        city: customer.city,
+        country: customer.country,
+        postal: customer.postal
+      },
+      amount, 
+      currency, 
+      status: 'pending', 
+      timestamp: new Date().toISOString() 
+    };
     
     await fetch(`${process.env.STORAGE_URL}/lpush/bx_orders`, {
       method: 'POST',
@@ -62,6 +79,7 @@ export default async function handler(req, res) {
             <p style="margin: 10px 0;"><strong>Name:</strong> ${customer.firstName} ${customer.lastName}</p>
             <p style="margin: 10px 0;"><strong>Email:</strong> ${customer.email}</p>
             <p style="margin: 10px 0;"><strong>Phone:</strong> ${customer.phone}</p>
+            <p style="margin: 10px 0;"><strong>Address:</strong> ${customer.address}, ${customer.city}, ${customer.country === 'uk' ? 'United Kingdom' : 'Nigeria'} ${customer.postal}</p>
           </div>
           <ul style="color: #fff; padding-left: 20px;">${itemsList}</ul>
           <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; border-left: 4px solid #FFD700;">
