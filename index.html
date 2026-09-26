@@ -907,6 +907,22 @@ if (order.customer) { shippingBox.style.display = 'block'; shippingDetails.inner
 
 if (document.readyState === 'complete' || document.readyState === 'interactive') { renderProducts(); renderFAQs(); updateCartUI(); renderMixMatchGrid1(); }
 </script>
+
+<!-- Site Visit Tracking Script -->
+<script>
+// Track site visits for admin analytics
+fetch('/api/track', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    page: window.location.pathname,
+    referrer: document.referrer || 'direct',
+    userAgent: navigator.userAgent,
+    timestamp: new Date().toISOString()
+  })
+}).catch(e => console.log('Track error:', e));
+</script>
+
 <a href="https://wa.me/447538277711" target="_blank" class="whatsapp-float" aria-label="Chat on WhatsApp"><i class="fab fa-whatsapp"></i></a>
 <div class="whatsapp-tooltip">Chat with us on WhatsApp</div>
 <div class="success-section" id="successSection">
