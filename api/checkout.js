@@ -37,29 +37,12 @@ export default async function handler(req, res) {
       cancel_url: `${req.headers.origin || 'https://bxclubhq.com'}?canceled=true`,
     });
 
-    // SAVE FULL ORDER WITH DELIVERY DETAILS
-    const orderData = { 
-      txRef, 
-      items, 
-      customer: {
-        firstName: customer.firstName,
-        lastName: customer.lastName,
-        email: customer.email,
-        phone: customer.phone,
-        address: customer.address,
-        city: customer.city,
-        country: customer.country,
-        postal: customer.postal
-      },
-      amount, 
-      currency, 
-      status: 'pending', 
-      timestamp: new Date().toISOString() 
-    };
+    // SAVE ORDER TO UPSTASH (Using Vercel's exact variable names)
+    const orderData = { txRef, items, customer, amount, currency, status: 'pending', timestamp: new Date().toISOString() };
     
-    await fetch(`${process.env.STORAGE_URL}/lpush/bx_orders`, {
+    await fetch(`${process.env.KV_REST_API_URL}/lpush/bx_orders`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${process.env.STORAGE_TOKEN}`, 'Content-Type': 'application/json' },
+      headers: { Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`, 'Content-Type': 'application/json' },
       body: JSON.stringify([JSON.stringify(orderData)])
     });
 
@@ -70,7 +53,7 @@ export default async function handler(req, res) {
     await resend.emails.send({
       from: 'BX CLUB Orders <onboarding@resend.dev>', 
       to: ['bxclubhq@gmail.com'],
-      subject: `🛍️ New Order Received — ${txRef}`,
+      subject: `️ New Order Received — ${txRef}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #fff; padding: 30px; border-radius: 8px;">
           <h1 style="color: #FFD700;">New Order Received!</h1>
