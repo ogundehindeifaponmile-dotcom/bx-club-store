@@ -27,9 +27,9 @@ export default async function handler(req, res) {
     const session = event.data.object;
     const txRef = session.metadata?.txRef;
 
-    // Update order status to 'paid' in Upstash
-    const fetchRes = await fetch(`${process.env.STORAGE_URL}/lrange/bx_orders/0/-1`, {
-      headers: { Authorization: `Bearer ${process.env.STORAGE_TOKEN}` }
+    // Update order status to 'paid' in Upstash using Vercel's exact variable names
+    const fetchRes = await fetch(`${process.env.KV_REST_API_URL}/lrange/bx_orders/0/-1`, {
+      headers: { Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}` }
     });
     const data = await fetchRes.json();
     let orders = (data.result || []).map(o => JSON.parse(o));
@@ -39,14 +39,14 @@ export default async function handler(req, res) {
       orders[orderIndex].status = 'paid';
       orders[orderIndex].verifiedAt = new Date().toISOString();
       
-      await fetch(`${process.env.STORAGE_URL}/del/bx_orders`, {
+      await fetch(`${process.env.KV_REST_API_URL}/del/bx_orders`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${process.env.STORAGE_TOKEN}` }
+        headers: { Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}` }
       });
       if (orders.length > 0) {
-        await fetch(`${process.env.STORAGE_URL}/lpush/bx_orders`, {
+        await fetch(`${process.env.KV_REST_API_URL}/lpush/bx_orders`, {
           method: 'POST',
-          headers: { Authorization: `Bearer ${process.env.STORAGE_TOKEN}`, 'Content-Type': 'application/json' },
+          headers: { Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`, 'Content-Type': 'application/json' },
           body: JSON.stringify(orders.map(o => JSON.stringify(o)))
         });
       }
