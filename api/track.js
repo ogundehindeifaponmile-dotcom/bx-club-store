@@ -12,10 +12,10 @@ export default async function handler(req, res) {
       ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
     };
 
-    // Save visit to Upstash
-    await fetch(`${process.env.STORAGE_URL}/lpush/bx_visits`, {
+    // Save visit to Upstash using Vercel's exact variable names
+    await fetch(`${process.env.KV_REST_API_URL}/lpush/bx_visits`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${process.env.STORAGE_TOKEN}`, 'Content-Type': 'application/json' },
+      headers: { Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`, 'Content-Type': 'application/json' },
       body: JSON.stringify([JSON.stringify(visitData)])
     });
 
