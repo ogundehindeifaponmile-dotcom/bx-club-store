@@ -1,26 +1,18 @@
-import { kv } from '@vercel/kv';
-
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    // Get all orders from Vercel KV
-    const orders = await kv.lrange('bx_orders', 0, -1) || [];
+    // Fetch all orders from Upstash using the new Vercel variable names
+    const response = await fetch(`${process.env.STORAGE_URL}/lrange/bx_orders/0/-1`, {
+      headers: { Authorization: `Bearer ${process.env.STORAGE_TOKEN}` }
+    });
+    const data = await response.json();
     
-    // Parse each order (they're stored as JSON strings)
-    const parsedOrders = orders.map(order => {
-      try {
-        return typeof order === 'string' ? JSON.parse(order) : order;
-      } catch (e) {
-        return null;
-      }
-    }).filter(Boolean);
-
-    res.status(200).json({ orders: parsedOrders });
+    const orders = (data.result || []).map(order => JSON.parse(order));
+    
+    res.status(200).json({ orders });
   } catch (error) {
-    console.error('Failed to fetch orders:', error);
+    console.error('Fetch Error:', error);
     res.status(500).json({ error: 'Failed to fetch orders', orders: [] });
   }
 }
