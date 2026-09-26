@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BX CLUB Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0a0a0a; color: #fff; font-family: 'Inter', sans-serif; min-height: 100vh; }
+.login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.login-card { background: #111; border: 1px solid #222; border-radius: 12px; padding: 48px 40px; max-width: 400px; width: 100%; text-align: center; }
+.login-card h1 { font-family: 'Oswald', sans-serif; color: #FFD700; font-size: 1.8rem; margin-bottom: 8px; letter-spacing: 0.05em; text-transform: uppercase; }
+.login-card p { color: #888; font-size: 0.85rem; margin-bottom: 32px; }
+.login-card input { width: 100%; padding: 14px 16px; background: #1a1a1a; border: 1px solid #333; color: #fff; font-size: 0.9rem; border-radius: 6px; margin-bottom: 16px; outline: none; font-family: 'Inter', sans-serif; }
+.login-card input:focus { border-color: #FFD700; }
+.login-card button { width: 100%; padding: 14px; background: #FFD700; color: #0a0a0a; border: none; font-family: 'Oswald', sans-serif; font-size: 0.9rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; border-radius: 6px; transition: background 0.3s; }
+.login-card button:hover { background: #E30613; color: #FFD700; }
+.login-error { color: #E30613; font-size: 0.8rem; margin-bottom: 16px; display: none; }
+
+.admin-dashboard { display: none; }
+.admin-dashboard.active { display: block; }
+.admin-header { background: #111; border-bottom: 1px solid #222; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
+.admin-header h1 { font-family: 'Oswald', sans-serif; color: #FFD700; font-size: 1.3rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.admin-header button { background: none; border: 1px solid #333; color: #888; padding: 8px 16px; font-size: 0.75rem; cursor: pointer; border-radius: 4px; font-family: 'Oswald', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; }
+.admin-header button:hover { border-color: #FFD700; color: #FFD700; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 40px; }
+.stat-card { background: #111; border: 1px solid #222; border-radius: 8px; padding: 24px; }
+.stat-card .label { color: #888; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px; font-family: 'Oswald', sans-serif; }
+.stat-card .value { color: #FFD700; font-size: 2rem; font-weight: 700; font-family: 'Oswald', sans-serif; }
+.stat-card .sub { color: #666; font-size: 0.75rem; margin-top: 4px; }
+
+.orders-section { padding: 0 40px 40px; }
+.orders-section h2 { font-family: 'Oswald', sans-serif; color: #FFD700; font-size: 1.1rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 20px; }
+.orders-table { width: 100%; background: #111; border: 1px solid #222; border-radius: 8px; overflow: hidden; }
+.orders-table table { width: 100%; border-collapse: collapse; }
+.orders-table th { background: #1a1a1a; padding: 14px 16px; text-align: left; font-family: 'Oswald', sans-serif; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: #888; font-weight: 600; border-bottom: 1px solid #222; }
+.orders-table td { padding: 16px; border-bottom: 1px solid #222; font-size: 0.85rem; color: #ccc; }
+.orders-table tr:last-child td { border-bottom: none; }
+.orders-table tr:hover { background: #1a1a1a; }
+.status-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.7rem; font-family: 'Oswald', sans-serif; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+.status-pending { background: rgba(255, 215, 0, 0.15); color: #FFD700; }
+.status-paid { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
+.status-failed { background: rgba(227, 6, 19, 0.15); color: #E30613; }
+
+.empty-state { text-align: center; padding: 60px 20px; color: #666; }
+.empty-state i { font-size: 3rem; margin-bottom: 16px; color: #333; }
+
+@media (max-width: 768px) {
+  .admin-header { padding: 16px 20px; flex-direction: column; gap: 12px; }
+  .stats-grid { padding: 20px; gap: 12px; }
+  .orders-section { padding: 0 20px 20px; }
+  .orders-table { overflow-x: auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <h1>Admin Access</h1>
+    <p>Enter your admin password to continue</p>
+    <div class="login-error" id="loginError">Incorrect password</div>
+    <input type="password" id="adminPassword" placeholder="Admin Password" onkeypress="if(event.key==='Enter') attemptLogin()">
+    <button onclick="attemptLogin()">Unlock Dashboard</button>
+  </div>
+</div>
+
+<div class="admin-dashboard" id="adminDashboard">
+  <div class="admin-header">
+    <h1>BX CLUB Admin</h1>
+    <div style="display: flex; gap: 12px;">
+      <button onclick="loadOrders()"><i class="fas fa-sync-alt" style="margin-right: 6px;"></i>Refresh</button>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="label">Total Orders</div>
+      <div class="value" id="statTotalOrders">0</div>
+      <div class="sub">All time</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Paid Orders</div>
+      <div class="value" id="statPaidOrders">0</div>
+      <div class="sub">Confirmed payments</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Total Revenue (NGN)</div>
+      <div class="value" id="statRevenueNGN">₦0</div>
+      <div class="sub">Nigerian Naira</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Total Revenue (GBP)</div>
+      <div class="value" id="statRevenueGBP">£0</div>
+      <div class="sub">British Pounds</div>
+    </div>
+  </div>
+
+  <div class="orders-section">
+    <h2>All Orders</h2>
+    <div class="orders-table" id="ordersTable">
+      <div class="empty-state">
+        <i class="fas fa-inbox"></i>
+        <p>Loading orders...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ⚠️ CHANGE THIS PASSWORD TO SOMETHING SECURE
+const ADMIN_PASSWORD = 'BXCLUB2026';
+
+function attemptLogin() {
+  const password = document.getElementById('adminPassword').value;
+  if (password === ADMIN_PASSWORD) {
+    sessionStorage.setItem('bx_admin_auth', 'true');
+    showDashboard();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+
+function showDashboard() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminDashboard').classList.add('active');
+  loadOrders();
+}
+
+function logout() {
+  sessionStorage.removeItem('bx_admin_auth');
+  location.reload();
+}
+
+async function loadOrders() {
+  try {
+    const response = await fetch('/api/orders');
+    const data = await response.json();
+    const orders = data.orders || [];
+    renderOrders(orders);
+    updateStats(orders);
+  } catch (error) {
+    console.error('Failed to load orders:', error);
+    document.getElementById('ordersTable').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Failed to load orders. Check the API.</p></div>';
+  }
+}
+
+function renderOrders(orders) {
+  if (orders.length === 0) {
+    document.getElementById('ordersTable').innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No orders yet</p></div>';
+    return;
+  }
+
+  const sortedOrders = [...orders].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  
+  const rows = sortedOrders.map(order => {
+    const currencySymbol = order.currency === 'GBP' ? '£' : '₦';
+    const statusClass = order.status === 'paid' ? 'status-paid' : order.status === 'failed' ? 'status-failed' : 'status-pending';
+    const statusText = order.status === 'paid' ? 'Paid' : order.status === 'failed' ? 'Failed' : 'Pending';
+    const date = new Date(order.timestamp).toLocaleString();
+    const customerName = order.customer ? `${order.customer.firstName} ${order.customer.lastName}` : 'Unknown';
+    const itemCount = order.items ? order.items.reduce((sum, i) => sum + (i.quantity || 1), 0) : 0;
+    
+    return `<tr>
+      <td><strong style="color: #FFD700;">#${order.txRef}</strong></td>
+      <td>${customerName}<br><span style="color: #666; font-size: 0.75rem;">${order.customer?.email || ''}</span></td>
+      <td>${itemCount} item${itemCount !== 1 ? 's' : ''}</td>
+      <td><strong>${currencySymbol}${(order.amount || 0).toLocaleString()}</strong><br><span style="color: #666; font-size: 0.75rem;">${order.currency}</span></td>
+      <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+      <td style="color: #666; font-size: 0.8rem;">${date}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('ordersTable').innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Items</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+function updateStats(orders) {
+  const total = orders.length;
+  const paid = orders.filter(o => o.status === 'paid').length;
+  const revenueNGN = orders.filter(o => o.currency === 'NGN' && o.status === 'paid').reduce((sum, o) => sum + (o.amount || 0), 0);
+  const revenueGBP = orders.filter(o => o.currency === 'GBP' && o.status === 'paid').reduce((sum, o) => sum + (o.amount || 0), 0);
+
+  document.getElementById('statTotalOrders').textContent = total;
+  document.getElementById('statPaidOrders').textContent = paid;
+  document.getElementById('statRevenueNGN').textContent = '₦' + revenueNGN.toLocaleString();
+  document.getElementById('statRevenueGBP').textContent = '£' + revenueGBP.toLocaleString();
+}
+
+// Auto-login if already authenticated
+if (sessionStorage.getItem('bx_admin_auth') === 'true') {
+  showDashboard();
+}
+</script>
+</body>
+</html>
