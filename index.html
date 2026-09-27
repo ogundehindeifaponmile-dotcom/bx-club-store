@@ -529,7 +529,7 @@ Pick any two items and create your own bundle. Mix a candle with a diffuser, or 
 <p style="font-size:0.7rem; color:#888; margin-top:4px;">You will be redirected to a secure Stripe page to complete your payment.</p>
 </div>
 <button type="submit" class="checkout-btn" style="margin-top:16px; background: #635bff; color: #fff;" id="submitOrderBtn">
-<i class="fas fa-lock" style="margin-right:8px;"></i>Pay with Stripe
+<i class="fas fa-lock" style="margin-right:8px;"></i>Continue to Payment
 </button>
 </div>
 <button type="button" onclick="backToInvoice()" style="width:100%;padding:14px;background:none;color:#888;border:1px solid #e5e5e5;font-family:'Oswald',sans-serif;font-size:0.8rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;margin-top:10px;">Back to Invoice</button>
@@ -839,7 +839,7 @@ async function placeOrder(e) {
         console.error('Checkout Error:', error);
         showToast('Payment failed: ' + error.message);
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-lock" style="margin-right:8px;"></i>Pay with Stripe';
+        submitBtn.innerHTML = '<i class="fas fa-lock" style="margin-right:8px;"></i>Continue to Payment';
     }
 }
 
