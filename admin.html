@@ -180,7 +180,7 @@ tr:hover { background: #1a1a1a; }
 </div>
 
 <script>
-const ADMIN_PASSWORD = 'BXCLUB2026';
+const ADMIN_PASSWORD = 'BXCLUB2026'; // ⚠️ CHANGE THIS TO A SECURE PASSWORD
 let allOrders = [];
 let allVisits = [];
 let isLoading = false;
@@ -209,7 +209,6 @@ function logout() {
 }
 
 function switchTab(tabName) {
-  // Fix: Use data attribute instead of event.target (more reliable)
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   
@@ -236,7 +235,6 @@ async function loadData() {
     
     const data = await res.json();
     
-    // Validate response structure
     if (!data || typeof data !== 'object') {
       throw new Error('Invalid response format');
     }
@@ -292,7 +290,6 @@ function renderOverview() {
   document.getElementById('statRevenueGBP').textContent = '£' + gbp.toLocaleString();
   document.getElementById('statVisits').textContent = allVisits.length;
 
-  // Show recent 5 orders
   const recent = [...allOrders].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
   
   if (recent.length === 0) {
@@ -324,8 +321,6 @@ function createOrderRow(order, isRecent) {
   const count = order.items ? order.items.reduce((s, i) => s + (i.quantity || 1), 0) : 0;
   
   const itemsCol = isRecent ? '' : `<td>${count}</td>`;
-  
-  // Safely slice txRef
   const shortRef = order.txRef ? `#${order.txRef.slice(-8)}` : '#Unknown';
   
   return `<tr>
@@ -426,12 +421,10 @@ function renderAnalytics() {
   document.getElementById('visitsList').innerHTML = items;
 }
 
-// Auto-login if session exists
 if (sessionStorage.getItem('bx_admin') === 'true') {
   showDashboard();
 }
 
-// Keyboard shortcut: Escape to close modals
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     const modal = document.querySelector('.modal-overlay');
