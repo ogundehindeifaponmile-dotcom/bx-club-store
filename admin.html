@@ -22,11 +22,12 @@ body { background: #0a0a0a; color: #fff; font-family: 'Inter', sans-serif; min-h
 .admin-dashboard.active { display: block; }
 .admin-header { background: #111; border-bottom: 1px solid #222; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
 .admin-header h1 { font-family: 'Oswald', sans-serif; color: #FFD700; font-size: 1.3rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.admin-header-right { display: flex; align-items: center; gap: 12px; }
 .admin-header button { background: none; border: 1px solid #333; color: #888; padding: 8px 16px; font-size: 0.75rem; cursor: pointer; border-radius: 4px; font-family: 'Oswald', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; }
 .admin-header button:hover { border-color: #FFD700; color: #FFD700; }
 
 .tabs { display: flex; gap: 0; background: #111; border-bottom: 1px solid #222; padding: 0 40px; }
-.tab { padding: 16px 24px; cursor: pointer; font-family: 'Oswald', sans-serif; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: #888; border-bottom: 3px solid transparent; transition: all 0.3s; }
+.tab { padding: 16px 24px; cursor: pointer; font-family: 'Oswald', sans-serif; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: #888; border-bottom: 3px solid transparent; transition: all 0.3s; user-select: none; }
 .tab:hover { color: #FFD700; }
 .tab.active { color: #FFD700; border-bottom-color: #FFD700; }
 
@@ -66,9 +67,16 @@ tr:hover { background: #1a1a1a; }
 
 .empty-state { text-align: center; padding: 60px 20px; color: #666; }
 .empty-state i { font-size: 3rem; margin-bottom: 16px; color: #333; }
+.empty-state.error i { color: #E30613; }
+.empty-state.error p { color: #E30613; }
 
 .view-btn { background: none; border: 1px solid #333; color: #FFD700; padding: 6px 12px; font-size: 0.7rem; cursor: pointer; border-radius: 4px; font-family: 'Oswald', sans-serif; text-transform: uppercase; }
 .view-btn:hover { background: #FFD700; color: #0a0a0a; }
+
+.refresh-btn { background: none; border: 1px solid #333; color: #888; padding: 8px 16px; font-size: 0.75rem; cursor: pointer; border-radius: 4px; font-family: 'Oswald', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+.refresh-btn:hover { border-color: #FFD700; color: #FFD700; }
+.refresh-btn.loading i { animation: spin 1s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 @media (max-width: 768px) {
   .admin-header { padding: 16px 20px; flex-direction: column; gap: 12px; }
@@ -93,13 +101,18 @@ tr:hover { background: #1a1a1a; }
 <div class="admin-dashboard" id="adminDashboard">
   <div class="admin-header">
     <h1>BX CLUB Admin</h1>
-    <button onclick="logout()"><i class="fas fa-sign-out-alt" style="margin-right: 6px;"></i>Logout</button>
+    <div class="admin-header-right">
+      <button class="refresh-btn" id="refreshBtn" onclick="refreshData()">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
+      <button onclick="logout()"><i class="fas fa-sign-out-alt" style="margin-right: 6px;"></i>Logout</button>
+    </div>
   </div>
 
   <div class="tabs">
-    <div class="tab active" onclick="switchTab('overview')">Overview</div>
-    <div class="tab" onclick="switchTab('orders')">Orders</div>
-    <div class="tab" onclick="switchTab('analytics')">Analytics</div>
+    <div class="tab active" data-tab="overview" onclick="switchTab('overview')">Overview</div>
+    <div class="tab" data-tab="orders" onclick="switchTab('orders')">Orders</div>
+    <div class="tab" data-tab="analytics" onclick="switchTab('analytics')">Analytics</div>
   </div>
 
   <div class="content">
@@ -136,7 +149,7 @@ tr:hover { background: #1a1a1a; }
       <h2 style="font-family: 'Oswald', sans-serif; color: #FFD700; font-size: 1.1rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.1em;">Recent Orders</h2>
       <div class="orders-table" id="recentOrdersTable">
         <div class="empty-state">
-          <i class="fas fa-inbox"></i>
+          <i class="fas fa-spinner fa-spin"></i>
           <p>Loading orders...</p>
         </div>
       </div>
@@ -147,7 +160,7 @@ tr:hover { background: #1a1a1a; }
       <h2 style="font-family: 'Oswald', sans-serif; color: #FFD700; font-size: 1.1rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.1em;">All Orders</h2>
       <div class="orders-table" id="allOrdersTable">
         <div class="empty-state">
-          <i class="fas fa-inbox"></i>
+          <i class="fas fa-spinner fa-spin"></i>
           <p>Loading orders...</p>
         </div>
       </div>
@@ -158,7 +171,7 @@ tr:hover { background: #1a1a1a; }
       <h2 style="font-family: 'Oswald', sans-serif; color: #FFD700; font-size: 1.1rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.1em;">Site Visits</h2>
       <div class="visits-list" id="visitsList">
         <div class="empty-state">
-          <i class="fas fa-chart-line"></i>
+          <i class="fas fa-spinner fa-spin"></i>
           <p>Loading visits...</p>
         </div>
       </div>
@@ -167,16 +180,20 @@ tr:hover { background: #1a1a1a; }
 </div>
 
 <script>
-const ADMIN_PASSWORD = 'BXCLUB2026'; // ⚠️ CHANGE THIS
+const ADMIN_PASSWORD = 'BXCLUB2026';
 let allOrders = [];
 let allVisits = [];
+let isLoading = false;
 
 function attemptLogin() {
-  if (document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
+  const input = document.getElementById('adminPassword');
+  if (input.value === ADMIN_PASSWORD) {
     sessionStorage.setItem('bx_admin', 'true');
     showDashboard();
   } else {
     document.getElementById('loginError').style.display = 'block';
+    input.value = '';
+    input.focus();
   }
 }
 
@@ -192,24 +209,75 @@ function logout() {
 }
 
 function switchTab(tabName) {
+  // Fix: Use data attribute instead of event.target (more reliable)
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById(tabName + 'Tab').classList.add('active');
+  
+  const tabElement = document.querySelector(`.tab[data-tab="${tabName}"]`);
+  if (tabElement) tabElement.classList.add('active');
+  
+  const contentElement = document.getElementById(tabName + 'Tab');
+  if (contentElement) contentElement.classList.add('active');
 }
 
 async function loadData() {
+  if (isLoading) return;
+  isLoading = true;
+  
+  const refreshBtn = document.getElementById('refreshBtn');
+  if (refreshBtn) refreshBtn.classList.add('loading');
+
   try {
     const res = await fetch('/api/orders');
+    
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+    
     const data = await res.json();
-    allOrders = data.orders || [];
-    allVisits = data.visits || [];
+    
+    // Validate response structure
+    if (!data || typeof data !== 'object') {
+      throw new Error('Invalid response format');
+    }
+    
+    allOrders = Array.isArray(data.orders) ? data.orders : [];
+    allVisits = Array.isArray(data.visits) ? data.visits : [];
+    
     renderOverview();
     renderOrders();
     renderAnalytics();
+    
   } catch (e) {
     console.error('Load Error:', e);
+    showErrorState(e.message);
+  } finally {
+    isLoading = false;
+    if (refreshBtn) refreshBtn.classList.remove('loading');
   }
+}
+
+function refreshData() {
+  allOrders = [];
+  allVisits = [];
+  loadData();
+}
+
+function showErrorState(message) {
+  const errorHtml = `
+    <div class="empty-state error">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p>Failed to load data</p>
+      <p style="font-size: 0.75rem; margin-top: 8px; color: #666;">${message}</p>
+      <button onclick="loadData()" style="margin-top: 16px; padding: 8px 16px; background: #FFD700; color: #0a0a0a; border: none; font-family: 'Oswald', sans-serif; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; cursor: pointer; border-radius: 4px;">
+        <i class="fas fa-sync-alt" style="margin-right: 6px;"></i>Retry
+      </button>
+    </div>
+  `;
+  
+  document.getElementById('recentOrdersTable').innerHTML = errorHtml;
+  document.getElementById('allOrdersTable').innerHTML = errorHtml;
+  document.getElementById('visitsList').innerHTML = errorHtml;
 }
 
 function renderOverview() {
@@ -226,6 +294,7 @@ function renderOverview() {
 
   // Show recent 5 orders
   const recent = [...allOrders].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
+  
   if (recent.length === 0) {
     document.getElementById('recentOrdersTable').innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No orders yet</p></div>';
     return;
@@ -250,74 +319,87 @@ function createOrderRow(order, isRecent) {
   const sym = order.currency === 'GBP' ? '£' : '₦';
   const statusClass = order.status === 'paid' ? 'status-paid' : order.status === 'failed' ? 'status-failed' : 'status-pending';
   const date = new Date(order.timestamp).toLocaleDateString();
-  const name = order.customer ? `${order.customer.firstName} ${order.customer.lastName}` : 'Unknown';
+  const name = order.customer ? `${order.customer.firstName || ''} ${order.customer.lastName || ''}`.trim() : 'Unknown';
+  const email = order.customer?.email || '';
   const count = order.items ? order.items.reduce((s, i) => s + (i.quantity || 1), 0) : 0;
   
   const itemsCol = isRecent ? '' : `<td>${count}</td>`;
   
+  // Safely slice txRef
+  const shortRef = order.txRef ? `#${order.txRef.slice(-8)}` : '#Unknown';
+  
   return `<tr>
-    <td style="color: #FFD700; font-weight: bold;">#${order.txRef.slice(-8)}</td>
-    <td>${name}<br><span style="color:#666; font-size:0.75rem;">${order.customer?.email || ''}</span></td>
+    <td style="color: #FFD700; font-weight: bold;">${shortRef}</td>
+    <td>${name}<br><span style="color:#666; font-size:0.75rem;">${email}</span></td>
     ${itemsCol}
     <td style="font-weight: bold;">${sym}${(order.amount || 0).toLocaleString()}</td>
     <td><span class="status-badge ${statusClass}">${order.status || 'pending'}</span></td>
     <td style="color: #666;">${date}</td>
-    <td><button class="view-btn" onclick="viewOrder('${order.txRef}')">View Details</button></td>
+    <td><button class="view-btn" onclick="viewOrder('${order.txRef || ''}')">View Details</button></td>
   </tr>`;
 }
 
 function viewOrder(txRef) {
   const order = allOrders.find(o => o.txRef === txRef);
-  if (!order) return;
+  if (!order) {
+    alert('Order not found');
+    return;
+  }
 
   const sym = order.currency === 'GBP' ? '£' : '₦';
   const country = order.customer?.country === 'uk' ? 'United Kingdom' : 'Nigeria';
   
   const itemsList = (order.items || []).map(item => 
     `<div style="padding: 8px 0; border-bottom: 1px solid #222;">
-      <div style="color: #FFD700; font-weight: 600;">${item.shortName || item.name}</div>
+      <div style="color: #FFD700; font-weight: 600;">${item.shortName || item.name || 'Unknown Item'}</div>
       <div style="color: #888; font-size: 0.8rem;">Qty: ${item.quantity || 1} × ${sym}${(item.price || 0).toLocaleString()}</div>
     </div>`
   ).join('');
 
   const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
   modal.style.cssText = 'position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px;';
+  modal.onclick = function(e) {
+    if (e.target === modal) modal.remove();
+  };
+  
   modal.innerHTML = `
-    <div style="background: #111; border: 1px solid #222; border-radius: 12px; padding: 30px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto;">
+    <div style="background: #111; border: 1px solid #222; border-radius: 12px; padding: 30px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-        <h2 style="font-family: 'Oswald', sans-serif; color: #FFD700; font-size: 1.3rem; text-transform: uppercase;">Order #${order.txRef.slice(-8)}</h2>
-        <button onclick="this.closest('div[style]').remove()" style="background: none; border: none; color: #888; font-size: 1.5rem; cursor: pointer;">×</button>
+        <h2 style="font-family: 'Oswald', sans-serif; color: #FFD700; font-size: 1.3rem; text-transform: uppercase;">Order #${order.txRef ? order.txRef.slice(-8) : 'Unknown'}</h2>
+        <button onclick="this.closest('.modal-overlay').remove()" style="background: none; border: none; color: #888; font-size: 1.5rem; cursor: pointer; padding: 0; line-height: 1;">&times;</button>
       </div>
       
       <div class="order-detail">
         <h3>Customer Information</h3>
         <div class="detail-row"><span class="detail-label">Name</span><span class="detail-value">${order.customer?.firstName || ''} ${order.customer?.lastName || ''}</span></div>
-        <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">${order.customer?.email || ''}</span></div>
-        <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-value">${order.customer?.phone || ''}</span></div>
+        <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">${order.customer?.email || 'N/A'}</span></div>
+        <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-value">${order.customer?.phone || 'N/A'}</span></div>
       </div>
 
       <div class="order-detail">
         <h3>Delivery Address</h3>
-        <div class="detail-row"><span class="detail-label">Address</span><span class="detail-value">${order.customer?.address || ''}</span></div>
-        <div class="detail-row"><span class="detail-label">City</span><span class="detail-value">${order.customer?.city || ''}</span></div>
+        <div class="detail-row"><span class="detail-label">Address</span><span class="detail-value">${order.customer?.address || 'N/A'}</span></div>
+        <div class="detail-row"><span class="detail-label">City</span><span class="detail-value">${order.customer?.city || 'N/A'}</span></div>
         <div class="detail-row"><span class="detail-label">Country</span><span class="detail-value">${country}</span></div>
-        <div class="detail-row"><span class="detail-label">Postal Code</span><span class="detail-value">${order.customer?.postal || ''}</span></div>
+        <div class="detail-row"><span class="detail-label">Postal Code</span><span class="detail-value">${order.customer?.postal || 'N/A'}</span></div>
       </div>
 
       <div class="order-detail">
         <h3>Items Ordered</h3>
-        ${itemsList}
+        ${itemsList || '<p style="color: #666;">No items</p>'}
       </div>
 
       <div class="order-detail">
         <h3>Payment Details</h3>
         <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value" style="color: ${order.status === 'paid' ? '#4ade80' : '#FFD700'};">${order.status || 'pending'}</span></div>
         <div class="detail-row"><span class="detail-label">Amount</span><span class="detail-value" style="color: #FFD700; font-size: 1.2rem; font-weight: bold;">${sym}${(order.amount || 0).toLocaleString()}</span></div>
-        <div class="detail-row"><span class="detail-label">Currency</span><span class="detail-value">${order.currency}</span></div>
+        <div class="detail-row"><span class="detail-label">Currency</span><span class="detail-value">${order.currency || 'N/A'}</span></div>
         <div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">${new Date(order.timestamp).toLocaleString()}</span></div>
       </div>
     </div>
   `;
+  
   document.body.appendChild(modal);
 }
 
@@ -344,7 +426,18 @@ function renderAnalytics() {
   document.getElementById('visitsList').innerHTML = items;
 }
 
-if (sessionStorage.getItem('bx_admin') === 'true') showDashboard();
+// Auto-login if session exists
+if (sessionStorage.getItem('bx_admin') === 'true') {
+  showDashboard();
+}
+
+// Keyboard shortcut: Escape to close modals
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const modal = document.querySelector('.modal-overlay');
+    if (modal) modal.remove();
+  }
+});
 </script>
 </body>
 </html>
