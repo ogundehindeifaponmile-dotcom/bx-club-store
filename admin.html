@@ -315,9 +315,18 @@ function renderOrders() {
 function createOrderRow(order, isRecent) {
   const sym = order.currency === 'GBP' ? '£' : '₦';
   const statusClass = order.status === 'paid' ? 'status-paid' : order.status === 'failed' ? 'status-failed' : 'status-pending';
-  const date = new Date(order.timestamp).toLocaleDateString();
+  
+  // SAFE DATE PARSING: Prevents "Invalid Date"
+  let dateDisplay = 'Unknown Date';
+  if (order.timestamp) {
+    const parsedDate = new Date(order.timestamp);
+    if (!isNaN(parsedDate.getTime())) {
+      dateDisplay = parsedDate.toLocaleDateString();
+    }
+  }
+
   const name = order.customer ? `${order.customer.firstName || ''} ${order.customer.lastName || ''}`.trim() : 'Unknown';
-  const email = order.customer?.email || '';
+  const email = order.customer?.email || 'No Email';
   const count = order.items ? order.items.reduce((s, i) => s + (i.quantity || 1), 0) : 0;
   
   const itemsCol = isRecent ? '' : `<td>${count}</td>`;
@@ -329,7 +338,7 @@ function createOrderRow(order, isRecent) {
     ${itemsCol}
     <td style="font-weight: bold;">${sym}${(order.amount || 0).toLocaleString()}</td>
     <td><span class="status-badge ${statusClass}">${order.status || 'pending'}</span></td>
-    <td style="color: #666;">${date}</td>
+    <td style="color: #666;">${dateDisplay}</td>
     <td><button class="view-btn" onclick="viewOrder('${order.txRef || ''}')">View Details</button></td>
   </tr>`;
 }
@@ -350,6 +359,15 @@ function viewOrder(txRef) {
       <div style="color: #888; font-size: 0.8rem;">Qty: ${item.quantity || 1} × ${sym}${(item.price || 0).toLocaleString()}</div>
     </div>`
   ).join('');
+
+  // SAFE DATE PARSING FOR MODAL
+  let modalDateDisplay = 'Unknown';
+  if (order.timestamp) {
+    const parsedDate = new Date(order.timestamp);
+    if (!isNaN(parsedDate.getTime())) {
+      modalDateDisplay = parsedDate.toLocaleString();
+    }
+  }
 
   const modal = document.createElement('div');
   modal.className = 'modal-overlay';
@@ -390,7 +408,7 @@ function viewOrder(txRef) {
         <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value" style="color: ${order.status === 'paid' ? '#4ade80' : '#FFD700'};">${order.status || 'pending'}</span></div>
         <div class="detail-row"><span class="detail-label">Amount</span><span class="detail-value" style="color: #FFD700; font-size: 1.2rem; font-weight: bold;">${sym}${(order.amount || 0).toLocaleString()}</span></div>
         <div class="detail-row"><span class="detail-label">Currency</span><span class="detail-value">${order.currency || 'N/A'}</span></div>
-        <div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">${new Date(order.timestamp).toLocaleString()}</span></div>
+        <div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">${modalDateDisplay}</span></div>
       </div>
     </div>
   `;
