@@ -819,7 +819,16 @@ async function placeOrder(e) {
                     const priceInfo = getCartItemPrice(item);
                     return { ...item, price: priceInfo.price };
                 }),
-                customer: { firstName, lastName, email, phone },
+                customer: { 
+                    firstName, 
+                    lastName, 
+                    email, 
+                    phone, 
+                    address, 
+                    city, 
+                    country, 
+                    postal 
+                },
                 amount: totalAmount,
                 currency: currentCurrency,
                 txRef: txRef
