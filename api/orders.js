@@ -2,23 +2,35 @@ export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    // Fetch orders using Vercel's exact variable names
-    const ordersRes = await fetch(`${process.env.KV_REST_API_URL}/lrange/bx_orders/0/-1`, {
-      headers: { Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}` }
+    const url = process.env.KV_REST_API_URL;
+    const token = process.env.KV_REST_API_TOKEN;
+
+    if (!url || !token) {
+      console.error('Missing KV Environment Variables');
+      return res.status(500).json({ error: 'Database configuration missing', orders: [], visits: [] });
+    }
+
+    // Fetch orders
+    const ordersRes = await fetch(`${url}/lrange/bx_orders/0/-1`, {
+      headers: { Authorization: `Bearer ${token}` }
     });
     const ordersData = await ordersRes.json();
-    const orders = (ordersData.result || []).map(order => JSON.parse(order));
+    const orders = (ordersData.result || []).map(order => {
+      try { return JSON.parse(order); } catch (e) { return null; }
+    }).filter(Boolean);
 
     // Fetch visits
-    const visitsRes = await fetch(`${process.env.KV_REST_API_URL}/lrange/bx_visits/0/-1`, {
-      headers: { Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}` }
+    const visitsRes = await fetch(`${url}/lrange/bx_visits/0/-1`, {
+      headers: { Authorization: `Bearer ${token}` }
     });
     const visitsData = await visitsRes.json();
-    const visits = (visitsData.result || []).map(visit => JSON.parse(visit));
+    const visits = (visitsData.result || []).map(visit => {
+      try { return JSON.parse(visit); } catch (e) { return null; }
+    }).filter(Boolean);
 
     res.status(200).json({ orders, visits });
   } catch (error) {
-    console.error('Fetch Error:', error);
-    res.status(500).json({ error: 'Failed to fetch data', orders: [], visits: [] });
+    console.error('API Orders Fetch Error:', error);
+    res.status(500).json({ error: error.message, orders: [], visits: [] });
   }
 }
