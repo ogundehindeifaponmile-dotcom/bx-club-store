@@ -2,7 +2,6 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// This is required for Stripe to read the raw body for signature verification
 export const config = { api: { bodyParser: false } };
 
 async function buffer(readable) {
@@ -20,60 +19,77 @@ export default async function handler(req, res) {
   const sig = req.headers['stripe-signature'];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
+  console.log('🔔 Webhook received. Headers:', req.headers);
+
   if (!webhookSecret) {
-    console.error('STRIPE_WEBHOOK_SECRET is missing!');
+    console.error('❌ CRITICAL: STRIPE_WEBHOOK_SECRET is missing in Vercel Environment Variables!');
     return res.status(500).json({ error: 'Webhook secret missing' });
   }
 
   let event;
   try {
     event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
+    console.log('✅ Webhook signature verified successfully.');
   } catch (err) {
-    console.error('Webhook signature verification failed:', err.message);
+    console.error('❌ Webhook signature verification failed:', err.message);
     return res.status(400).json({ error: `Webhook Error: ${err.message}` });
   }
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
     const txRef = session.metadata?.txRef;
-    console.log('Webhook received for order:', txRef);
+    console.log('💳 Checkout completed for session:', session.id, 'txRef:', txRef);
 
     const url = process.env.KV_REST_API_URL;
     const token = process.env.KV_REST_API_TOKEN;
 
+    if (!url || !token) {
+      console.error('❌ CRITICAL: Upstash KV environment variables are missing!');
+      return res.status(200).json({ received: true }); // Return 200 so Stripe doesn't keep retrying
+    }
+
     try {
-      // Fetch current orders
+      // 1. Fetch all orders
+      console.log('📥 Fetching orders from Upstash...');
       const fetchRes = await fetch(`${url}/lrange/bx_orders/0/-1`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await fetchRes.json();
+      console.log('📦 Upstash raw response:', data);
+
       let orders = (data.result || []).map(o => {
         try { return JSON.parse(o); } catch (e) { return null; }
       }).filter(Boolean);
-      
+
+      // 2. Find and update the specific order
       const orderIndex = orders.findIndex(o => o.txRef === txRef);
+      
       if (orderIndex !== -1) {
+        console.log('✅ Found order in database. Updating status to "paid"...');
         orders[orderIndex].status = 'paid';
         orders[orderIndex].verifiedAt = new Date().toISOString();
         
-        // Clear and re-save
+        // 3. Delete old list and save updated list
         await fetch(`${url}/del/bx_orders`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` }
         });
         
-        await fetch(`${url}/lpush/bx_orders`, {
+        const pushRes = await fetch(`${url}/lpush/bx_orders`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify(orders.map(o => JSON.stringify(o)))
         });
-        console.log('Order updated to paid:', txRef);
+        console.log('💾 Upstash update response:', await pushRes.json());
+      } else {
+        console.warn('⚠️ Order txRef not found in database:', txRef);
       }
 
-      // Send Customer Receipt Email
+      // 4. Send Customer Receipt Email
       const customerName = session.metadata?.customerName || 'Customer';
       const currencySymbol = session.currency === 'gbp' ? '£' : '₦';
       
+      console.log('📧 Sending receipt email to:', session.customer_email);
       await resend.emails.send({
         from: 'BX CLUB <onboarding@resend.dev>',
         to: [session.customer_email],
@@ -88,8 +104,10 @@ export default async function handler(req, res) {
           </div>
         `,
       });
+      console.log('✅ Receipt email sent successfully.');
+
     } catch (dbError) {
-      console.error('Database update failed in webhook:', dbError);
+      console.error('❌ Database update failed in webhook:', dbError);
     }
   }
 
