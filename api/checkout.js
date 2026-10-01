@@ -6,7 +6,15 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
+    console.log('✅ Checkout API called. Body:', JSON.stringify(req.body, null, 2));
+    
     const { items, customer, amount, currency, txRef } = req.body;
+
+    if (!items || !customer || !amount || !currency || !txRef) {
+      console.error('❌ Missing required fields in checkout request');
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
     const stripeCurrency = currency === 'GBP' ? 'gbp' : 'ngn';
 
     const lineItems = items.map(item => ({
@@ -27,6 +35,7 @@ export default async function handler(req, res) {
       });
     }
 
+    console.log('💳 Creating Stripe session...');
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: lineItems,
@@ -36,24 +45,53 @@ export default async function handler(req, res) {
       success_url: `${req.headers.origin || 'https://bxclubhq.com'}?success=true&order=${txRef}`,
       cancel_url: `${req.headers.origin || 'https://bxclubhq.com'}?canceled=true`,
     });
+    console.log('✅ Stripe session created:', session.id);
 
-    // SAVE ORDER TO UPSTASH (Using Vercel's exact variable names)
-    const orderData = { txRef, items, customer, amount, currency, status: 'pending', timestamp: new Date().toISOString() };
-    
-    await fetch(`${process.env.KV_REST_API_URL}/lpush/bx_orders`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify([JSON.stringify(orderData)])
-    });
+    // SAVE ORDER TO UPSTASH
+    const orderData = { 
+      txRef, 
+      items, 
+      customer: {
+        firstName: customer.firstName,
+        lastName: customer.lastName,
+        email: customer.email,
+        phone: customer.phone,
+        address: customer.address || 'N/A',
+        city: customer.city || 'N/A',
+        country: customer.country || 'N/A',
+        postal: customer.postal || 'N/A'
+      },
+      amount, 
+      currency, 
+      status: 'pending', 
+      timestamp: new Date().toISOString() 
+    };
+
+    console.log('💾 Saving to Upstash KV...');
+    const kvUrl = process.env.KV_REST_API_URL;
+    const kvToken = process.env.KV_REST_API_TOKEN;
+
+    if (!kvUrl || !kvToken) {
+      console.error('❌ Missing KV Environment Variables!');
+    } else {
+      const kvRes = await fetch(`${kvUrl}/lpush/bx_orders`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${kvToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify([JSON.stringify(orderData)])
+      });
+      const kvData = await kvRes.json();
+      console.log('✅ Upstash KV Response:', kvData);
+    }
 
     // Send Admin Email
+    console.log('📧 Sending admin email via Resend...');
     const currencySymbol = currency === 'GBP' ? '£' : '₦';
     const itemsList = items.map(item => `<li style="margin-bottom: 8px;">${item.shortName || item.name} × ${item.quantity} — ${currencySymbol}${(item.price * item.quantity).toLocaleString()}</li>`).join('');
 
-    await resend.emails.send({
+    const emailRes = await resend.emails.send({
       from: 'BX CLUB Orders <onboarding@resend.dev>', 
       to: ['bxclubhq@gmail.com'],
-      subject: `️ New Order Received — ${txRef}`,
+      subject: `🛍️ New Order Received — ${txRef}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #fff; padding: 30px; border-radius: 8px;">
           <h1 style="color: #FFD700;">New Order Received!</h1>
@@ -62,7 +100,7 @@ export default async function handler(req, res) {
             <p style="margin: 10px 0;"><strong>Name:</strong> ${customer.firstName} ${customer.lastName}</p>
             <p style="margin: 10px 0;"><strong>Email:</strong> ${customer.email}</p>
             <p style="margin: 10px 0;"><strong>Phone:</strong> ${customer.phone}</p>
-            <p style="margin: 10px 0;"><strong>Address:</strong> ${customer.address}, ${customer.city}, ${customer.country === 'uk' ? 'United Kingdom' : 'Nigeria'} ${customer.postal}</p>
+            <p style="margin: 10px 0;"><strong>Address:</strong> ${customer.address || 'N/A'}, ${customer.city || 'N/A'}, ${customer.country || 'N/A'} ${customer.postal || 'N/A'}</p>
           </div>
           <ul style="color: #fff; padding-left: 20px;">${itemsList}</ul>
           <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; border-left: 4px solid #FFD700;">
@@ -71,10 +109,11 @@ export default async function handler(req, res) {
         </div>
       `,
     });
+    console.log('✅ Resend email response:', emailRes);
 
     res.status(200).json({ url: session.url });
   } catch (error) {
-    console.error('Checkout Error:', error);
+    console.error('❌ Checkout API CRASHED:', error);
     res.status(500).json({ error: error.message });
   }
 }
