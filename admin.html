@@ -120,7 +120,7 @@ tr:hover { background: #1a1a1a; }
       <div class="stats-grid">
         <div class="stat-card"><div class="label">Total Orders</div><div class="value" id="statTotalOrders">0</div><div class="sub">All time</div></div>
         <div class="stat-card"><div class="label">Paid Orders</div><div class="value" id="statPaidOrders">0</div><div class="sub">Confirmed payments</div></div>
-        <div class="stat-card"><div class="label">Revenue (NGN)</div><div class="value" id="statRevenueNGN">₦0</div><div class="sub">Nigerian Naira</div></div>
+        <div class="stat-card"><div class="label">Revenue (NGN)</div><div class="value" id="statRevenueNGN">0</div><div class="sub">Nigerian Naira</div></div>
         <div class="stat-card"><div class="label">Revenue (GBP)</div><div class="value" id="statRevenueGBP">£0</div><div class="sub">British Pounds</div></div>
         <div class="stat-card"><div class="label">Site Visits</div><div class="value" id="statVisits">0</div><div class="sub">Total visits</div></div>
       </div>
@@ -145,6 +145,13 @@ const ADMIN_PASSWORD = 'BXCLUB2026';
 let allOrders = [];
 let allVisits = [];
 let isLoading = false;
+
+// BULLETPROOF DATE PARSER
+function parseDateSafe(timestamp) {
+  if (!timestamp) return null;
+  const d = new Date(timestamp);
+  return isNaN(d.getTime()) ? null : d;
+}
 
 function attemptLogin() {
   const input = document.getElementById('adminPassword');
@@ -173,14 +180,6 @@ function switchTab(tabName) {
   if (tabElement) tabElement.classList.add('active');
   const contentElement = document.getElementById(tabName + 'Tab');
   if (contentElement) contentElement.classList.add('active');
-}
-
-// SAFE DATE HELPER FUNCTION
-function getSafeDate(timestamp) {
-  if (!timestamp) return 'Unknown Date';
-  const parsed = new Date(timestamp);
-  if (isNaN(parsed.getTime())) return 'Unknown Date';
-  return parsed;
 }
 
 async function loadData() {
@@ -231,10 +230,9 @@ function renderOverview() {
   document.getElementById('statRevenueGBP').textContent = '£' + gbp.toLocaleString();
   document.getElementById('statVisits').textContent = allVisits.length;
 
-  // SAFE SORTING
   const recent = [...allOrders].sort((a, b) => {
-    const dateA = getSafeDate(a.timestamp).getTime() || 0;
-    const dateB = getSafeDate(b.timestamp).getTime() || 0;
+    const dateA = parseDateSafe(a.timestamp)?.getTime() || 0;
+    const dateB = parseDateSafe(b.timestamp)?.getTime() || 0;
     return dateB - dateA;
   }).slice(0, 5);
   
@@ -251,10 +249,9 @@ function renderOrders() {
     document.getElementById('allOrdersTable').innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No orders yet</p></div>';
     return;
   }
-  // SAFE SORTING
   const sorted = [...allOrders].sort((a, b) => {
-    const dateA = getSafeDate(a.timestamp).getTime() || 0;
-    const dateB = getSafeDate(b.timestamp).getTime() || 0;
+    const dateA = parseDateSafe(a.timestamp)?.getTime() || 0;
+    const dateB = parseDateSafe(b.timestamp)?.getTime() || 0;
     return dateB - dateA;
   });
   const rows = sorted.map(o => createOrderRow(o, false)).join('');
@@ -262,10 +259,12 @@ function renderOrders() {
 }
 
 function createOrderRow(order, isRecent) {
-  const sym = order.currency === 'GBP' ? '£' : '₦';
+  const sym = order.currency === 'GBP' ? '£' : '';
   const statusClass = order.status === 'paid' ? 'status-paid' : order.status === 'failed' ? 'status-failed' : 'status-pending';
   
-  const dateDisplay = getSafeDate(order.timestamp).toLocaleDateString();
+  const dateObj = parseDateSafe(order.timestamp);
+  const dateDisplay = dateObj ? dateObj.toLocaleDateString() : 'Unknown Date';
+  
   const name = order.customer ? `${order.customer.firstName || ''} ${order.customer.lastName || ''}`.trim() : 'Unknown';
   const email = order.customer?.email || 'No Email';
   const count = order.items ? order.items.reduce((s, i) => s + (i.quantity || 1), 0) : 0;
@@ -297,7 +296,8 @@ function viewOrder(txRef) {
     </div>`
   ).join('');
 
-  const modalDateDisplay = getSafeDate(order.timestamp).toLocaleString();
+  const dateObj = parseDateSafe(order.timestamp);
+  const modalDateDisplay = dateObj ? dateObj.toLocaleString() : 'Unknown Date';
 
   const modal = document.createElement('div');
   modal.className = 'modal-overlay';
@@ -345,15 +345,15 @@ function renderAnalytics() {
     return;
   }
 
-  // SAFE SORTING FOR VISITS
   const recent = [...allVisits].sort((a, b) => {
-    const dateA = getSafeDate(a.timestamp).getTime() || 0;
-    const dateB = getSafeDate(b.timestamp).getTime() || 0;
+    const dateA = parseDateSafe(a.timestamp)?.getTime() || 0;
+    const dateB = parseDateSafe(b.timestamp)?.getTime() || 0;
     return dateB - dateA;
   }).slice(0, 50);
 
   const items = recent.map(v => {
-    const date = getSafeDate(v.timestamp).toLocaleString();
+    const dateObj = parseDateSafe(v.timestamp);
+    const date = dateObj ? dateObj.toLocaleString() : 'Unknown Date';
     const page = v.page || 'unknown';
     const ref = v.referrer || 'direct';
     return `<div class="visit-item">
