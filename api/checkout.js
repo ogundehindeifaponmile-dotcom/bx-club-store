@@ -89,8 +89,8 @@ export default async function handler(req, res) {
     const itemsList = items.map(item => `<li style="margin-bottom: 8px;">${item.shortName || item.name} × ${item.quantity} — ${currencySymbol}${(item.price * item.quantity).toLocaleString()}</li>`).join('');
 
     const emailRes = await resend.emails.send({
-      from: 'BX CLUB Orders <onboarding@resend.dev>', 
-      to: ['bxclubhq@gmail.com'],
+      from: 'BX CLUB Orders <orders@mg.bxclubhq.com>', // ✅ Uses your newly verified domain!
+      to: ['bxclubhq@gmail.com'], // ✅ Sends to your business email
       subject: `🛍️ New Order Received — ${txRef}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #fff; padding: 30px; border-radius: 8px;">
