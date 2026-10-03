@@ -2,20 +2,28 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { page, referrer, userAgent, timestamp } = req.body;
-    
+    const url = process.env.KV_REST_API_URL;
+    const token = process.env.KV_REST_API_TOKEN;
+
+    if (!url || !token) {
+      console.error('Missing KV Environment Variables');
+      return res.status(500).json({ error: 'Database config missing' });
+    }
+
+    // Force a valid timestamp and capture location data
     const visitData = {
-      page: page || 'unknown',
-      referrer: referrer || 'direct',
-      userAgent: userAgent || 'unknown',
-      timestamp: timestamp || new Date().toISOString(),
-      ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress
+      page: req.body.page || 'unknown',
+      referrer: req.body.referrer || 'direct',
+      userAgent: req.body.userAgent || 'unknown',
+      timestamp: req.body.timestamp || new Date().toISOString(), // Ensures valid date
+      country: req.body.country || 'Unknown',
+      city: req.body.city || 'Unknown',
+      ip: req.headers['x-forwarded-for'] || 'unknown'
     };
 
-    // Save visit to Upstash using Vercel's exact variable names
-    await fetch(`${process.env.KV_REST_API_URL}/lpush/bx_visits`, {
+    await fetch(`${url}/lpush/bx_visits`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`, 'Content-Type': 'application/json' },
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify([JSON.stringify(visitData)])
     });
 
