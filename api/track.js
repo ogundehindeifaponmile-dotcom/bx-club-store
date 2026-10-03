@@ -10,12 +10,11 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Database config missing' });
     }
 
-    // Force a valid timestamp and capture location data
     const visitData = {
       page: req.body.page || 'unknown',
       referrer: req.body.referrer || 'direct',
       userAgent: req.body.userAgent || 'unknown',
-      timestamp: req.body.timestamp || new Date().toISOString(), // Ensures valid date
+      timestamp: req.body.timestamp || new Date().toISOString(),
       country: req.body.country || 'Unknown',
       city: req.body.city || 'Unknown',
       ip: req.headers['x-forwarded-for'] || 'unknown'
