@@ -120,7 +120,7 @@ tr:hover { background: #1a1a1a; }
       <div class="stats-grid">
         <div class="stat-card"><div class="label">Total Orders</div><div class="value" id="statTotalOrders">0</div><div class="sub">All time</div></div>
         <div class="stat-card"><div class="label">Paid Orders</div><div class="value" id="statPaidOrders">0</div><div class="sub">Confirmed payments</div></div>
-        <div class="stat-card"><div class="label">Revenue (NGN)</div><div class="value" id="statRevenueNGN">0</div><div class="sub">Nigerian Naira</div></div>
+        <div class="stat-card"><div class="label">Revenue (NGN)</div><div class="value" id="statRevenueNGN">₦0</div><div class="sub">Nigerian Naira</div></div>
         <div class="stat-card"><div class="label">Revenue (GBP)</div><div class="value" id="statRevenueGBP">£0</div><div class="sub">British Pounds</div></div>
         <div class="stat-card"><div class="label">Site Visits</div><div class="value" id="statVisits">0</div><div class="sub">Total visits</div></div>
       </div>
@@ -259,7 +259,7 @@ function renderOrders() {
 }
 
 function createOrderRow(order, isRecent) {
-  const sym = order.currency === 'GBP' ? '£' : '';
+  const sym = order.currency === 'GBP' ? '£' : '₦';
   const statusClass = order.status === 'paid' ? 'status-paid' : order.status === 'failed' ? 'status-failed' : 'status-pending';
   
   const dateObj = parseDateSafe(order.timestamp);
@@ -345,6 +345,7 @@ function renderAnalytics() {
     return;
   }
 
+  // Sort visits by date safely
   const recent = [...allVisits].sort((a, b) => {
     const dateA = parseDateSafe(a.timestamp)?.getTime() || 0;
     const dateB = parseDateSafe(b.timestamp)?.getTime() || 0;
@@ -356,12 +357,15 @@ function renderAnalytics() {
     const date = dateObj ? dateObj.toLocaleString() : 'Unknown Date';
     const page = v.page || 'unknown';
     const ref = v.referrer || 'direct';
+    const country = v.country || 'Unknown';
+    const city = v.city || '';
+
     return `<div class="visit-item">
-      <div>
-        <div class="visit-page">${page}</div>
-        <div class="visit-meta">From: ${ref}</div>
+      <div style="flex: 1;">
+        <div class="visit-page">${page} <span style="color:#4ade80; font-size:0.75rem; margin-left:8px;">📍 ${country}</span></div>
+        <div class="visit-meta">From: ${ref} ${city ? '• ' + city : ''}</div>
       </div>
-      <div class="visit-meta">${date}</div>
+      <div class="visit-meta" style="text-align:right; min-width: 120px;">${date}</div>
     </div>`;
   }).join('');
 
