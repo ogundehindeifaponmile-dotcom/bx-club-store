@@ -917,40 +917,18 @@ if (order.customer) { shippingBox.style.display = 'block'; shippingDetails.inner
 if (document.readyState === 'complete' || document.readyState === 'interactive') { renderProducts(); renderFAQs(); updateCartUI(); renderMixMatchGrid1(); }
 </script>
 
-<!-- Enhanced Site Visit Tracking with Location -->
+<!-- Simple, Reliable Server-Side Tracking -->
 <script>
-async function trackVisit() {
-    let locationData = { country: 'Unknown', city: 'Unknown' };
-    
-    // 1. Try to get location from IP
-    try {
-        const res = await fetch('https://ipapi.co/json/');
-        if (res.ok) {
-            const data = await res.json();
-            locationData.country = data.country_name || 'Unknown';
-            locationData.city = data.city || 'Unknown';
-        }
-    } catch (e) {
-        console.log('Location fetch failed', e);
-    }
-
-    // 2. Send data to backend
-    fetch('/api/track', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            page: window.location.pathname,
-            referrer: document.referrer || 'direct',
-            userAgent: navigator.userAgent,
-            timestamp: new Date().toISOString(), // Force fresh, valid timestamp
-            country: locationData.country,
-            city: locationData.city
-        })
-    }).catch(e => console.log('Track error:', e));
-}
-
-// Run tracking immediately
-trackVisit();
+// We only send the page info. The server handles the location and timestamp!
+fetch('/api/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        page: window.location.pathname,
+        referrer: document.referrer || 'direct',
+        userAgent: navigator.userAgent
+    })
+}).catch(e => console.log('Track error:', e));
 </script>
 <a href="https://wa.me/447538277711" target="_blank" class="whatsapp-float" aria-label="Chat on WhatsApp"><i class="fab fa-whatsapp"></i></a>
 <div class="whatsapp-tooltip">Chat with us on WhatsApp</div>
