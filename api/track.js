@@ -10,11 +10,10 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Database config missing' });
     }
 
-    // Vercel automatically provides these headers! No external service needed.
+    // Vercel automatically provides these headers! Ad-blockers cannot block this.
     const country = req.headers['x-vercel-ip-country'] || req.headers['x-forwarded-country'] || 'Unknown';
     const city = req.headers['x-vercel-ip-city'] || req.headers['x-forwarded-city'] || 'Unknown';
-    const ip = req.headers['x-forwarded-for'] || 'Unknown';
-
+    
     // Server guarantees a valid, unbreakable timestamp
     const timestamp = new Date().toISOString();
 
@@ -24,8 +23,7 @@ export default async function handler(req, res) {
       userAgent: req.body.userAgent || 'unknown',
       timestamp: timestamp, 
       country: country,
-      city: city,
-      ip: ip
+      city: city
     };
 
     await fetch(`${url}/lpush/bx_visits`, {
