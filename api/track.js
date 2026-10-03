@@ -6,15 +6,12 @@ export default async function handler(req, res) {
     const token = process.env.KV_REST_API_TOKEN;
 
     if (!url || !token) {
-      console.error('Missing KV Environment Variables');
+      console.error('❌ Missing KV Environment Variables');
       return res.status(500).json({ error: 'Database config missing' });
     }
 
-    // Vercel automatically provides these headers! Ad-blockers cannot block this.
     const country = req.headers['x-vercel-ip-country'] || req.headers['x-forwarded-country'] || 'Unknown';
     const city = req.headers['x-vercel-ip-city'] || req.headers['x-forwarded-city'] || 'Unknown';
-    
-    // Server guarantees a valid, unbreakable timestamp
     const timestamp = new Date().toISOString();
 
     const visitData = {
@@ -26,15 +23,22 @@ export default async function handler(req, res) {
       city: city
     };
 
-    await fetch(`${url}/lpush/bx_visits`, {
+    console.log('💾 Attempting to save to Upstash:', visitData);
+
+    const saveRes = await fetch(`${url}/lpush/bx_visits`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify([JSON.stringify(visitData)])
     });
+    
+    const saveData = await saveRes.json();
+    console.log('✅ Upstash Response:', saveData);
 
-    res.status(200).json({ success: true });
+    // THIS IS THE MAGIC LINE: It sends the data back to your console!
+    res.status(200).json({ success: true, whatWeSaved: visitData });
+    
   } catch (error) {
-    console.error('Track Error:', error);
+    console.error('❌ Track Error:', error);
     res.status(500).json({ error: 'Failed to track visit' });
   }
 }
