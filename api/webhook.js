@@ -74,22 +74,31 @@ export default async function handler(req, res) {
             console.warn('⚠️ Order txRef not found in database:', txRef);
           }
         } catch (dbError) {
-          console.error(' Database update failed:', dbError);
+          console.error('❌ Database update failed:', dbError);
         }
       }
 
-      // 4. Send Customer Receipt Email (Optional but recommended)
+      // 4. Send Customer Receipt Email
       try {
         const customerName = session.metadata?.customerName || 'Customer';
         const currencySymbol = session.currency === 'gbp' ? '£' : '₦';
         
         await resend.emails.send({
-          from: 'BX CLUB <onboarding@resend.dev>',
-          to: [session.customer_email],
+          from: 'BX CLUB <orders@mg.bxclubhq.com>', // ✅ Uses your newly verified domain!
+          to: [session.customer_email], // ✅ Sends directly to the customer
           subject: `✅ Order Confirmed — #${txRef}`,
-          html: `<div style="font-family: sans-serif; text-align: center; padding: 20px;"><h1>Thank you!</h1><p>Your order #${txRef} is confirmed.</p></div>`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #fff; padding: 30px; border-radius: 8px; text-align: center;">
+              <h1 style="color: #FFD700;">Thank You, ${customerName.split(' ')[0]}!</h1>
+              <p style="color: #888;">Your order #${txRef} has been received and is being prepared.</p>
+              <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; margin-top: 20px;">
+                <p style="color: #FFD700; font-size: 24px; font-weight: bold; margin: 0;">${currencySymbol}${(session.amount_total / 100).toLocaleString()}</p>
+              </div>
+              <p style="color: #666; font-size: 12px; margin-top: 30px;">BX CLUB | Blackxcellencee</p>
+            </div>
+          `,
         });
-        console.log('📧 Receipt email sent.');
+        console.log('📧 Receipt email sent successfully to:', session.customer_email);
       } catch (emailError) {
         console.error('❌ Email failed:', emailError);
       }
