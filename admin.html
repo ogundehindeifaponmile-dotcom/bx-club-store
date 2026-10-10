@@ -196,16 +196,24 @@ async function loadData() {
     
     allOrders = Array.isArray(data.orders) ? data.orders : [];
     allVisits = Array.isArray(data.visits) ? data.visits : [];
-    
-    renderOverview();
-    renderOrders();
-    renderAnalytics();
   } catch (e) {
-    console.error('Load Error:', e);
-    showErrorState(e.message);
+    console.warn('⚠️ API fetch failed, falling back to local storage:', e);
+    // FALLBACK: Read directly from the browser's local storage if API fails
+    try {
+      const localOrders = localStorage.getItem('bxclub_orders');
+      allOrders = localOrders ? JSON.parse(localOrders) : [];
+    } catch (err) {
+      console.error('❌ Local storage parse failed:', err);
+      allOrders = [];
+    }
+    allVisits = []; // Visits are server-side only
   } finally {
     isLoading = false;
     if (refreshBtn) refreshBtn.classList.remove('loading');
+    // ALWAYS render, even if we fell back to local storage
+    renderOverview();
+    renderOrders();
+    renderAnalytics();
   }
 }
 
