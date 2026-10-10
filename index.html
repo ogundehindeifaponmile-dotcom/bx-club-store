@@ -689,7 +689,7 @@ function getShippingCost(country) {
     return convertFromNGN(SHIPPING_NIGERIA_NGN); 
 }
 
-// NEW: Smart shipping calculator that applies ₦1000 shipping for the TEST 101 product
+// Smart shipping calculator that applies ₦1000 shipping for the TEST 101 product
 function getEffectiveShipping(country) {
     const isTestOrder = cart.some(item => item.id === 999);
     if (isTestOrder) {
@@ -822,32 +822,37 @@ async function placeOrder(e) {
     const sym = currentCurrency === 'GBP' ? '£' : '₦';
     const countryName = country === 'uk' ? 'United Kingdom' : 'Nigeria';
 
-    // --- EMAIL WORKAROUND STARTS HERE ---
-    let itemsList = cart.map(item => `- ${item.shortName || item.name} (x${item.quantity})`).join('%0D%0A');
-
-    const mailSubject = `New Order: ${firstName} ${lastName} (${txRef})`;
-    const mailBody = `Hello BX CLUB,%0D%0A%0D%0AI am placing a new order. Please find my details below:%0D%0A%0D%0A--- ORDER DETAILS ---%0D%0A${itemsList}%0D%0A%0D%0ASubtotal: ${sym}${subtotal.toLocaleString()}%0D%0AShipping: ${sym}${shipping.toLocaleString()}%0D%0ATOTAL TO PAY: ${sym}${totalAmount.toLocaleString()}%0D%0A%0D%0A--- DELIVERY DETAILS ---%0D%0AName: ${firstName} ${lastName}%0D%0AEmail: ${email}%0D%0APhone: ${phone}%0D%0AAddress: ${address}%0D%0ACity: ${city}%0D%0ACountry: ${countryName}%0D%0APostal Code: ${postal}%0D%0A%0D%0AOrder Reference: ${txRef}`;
-
-    // Opens their default mail app in a new tab/window
-    window.open(`mailto:bxclubhq@gmail.com?subject=${encodeURIComponent(mailSubject)}&body=${mailBody}`, '_blank');
+    // 1. SAVE TO LOCAL STORAGE (Guarantees Admin Dashboard can see it even if API lags)
+    const orderDetails = {
+        txRef: txRef, items: cart,
+        customer: { firstName, lastName, email, phone, address, city, country, postal },
+        currency: currentCurrency, amount: totalAmount, subtotal, shippingCost: shipping,
+        paymentMethod: 'stripe', status: 'pending', timestamp: new Date().toISOString()
+    };
     
-    // Show a quick toast message
-    showToast('Please send the email, then complete payment!');
-    // --- EMAIL WORKAROUND ENDS HERE ---
-
     try {
-        const orderDetails = {
-            txRef: txRef, items: cart,
-            customer: { firstName, lastName, email, phone, address, city, country, postal },
-            currency: currentCurrency, amount: totalAmount, subtotal, shippingCost: shipping,
-            paymentMethod: 'stripe', status: 'pending', timestamp: new Date().toISOString()
-        };
-        
         const orders = JSON.parse(safeGet('bxclub_orders') || '[]');
         orders.push(orderDetails);
         safeSet('bxclub_orders', JSON.stringify(orders));
+        // Trigger storage event for admin dashboard if open in another tab
         window.dispatchEvent(new StorageEvent('storage', { key: 'bxclub_orders', newValue: JSON.stringify(orders) }));
+    } catch (e) {
+        console.error('Local storage save failed', e);
+    }
 
+    // 2. TRIGGER MAILTO (Using hidden link click to bypass popup blockers)
+    let itemsList = cart.map(item => `- ${item.shortName || item.name} (x${item.quantity})`).join('\n');
+    const mailSubject = `New Order: ${firstName} ${lastName} (${txRef})`;
+    const mailBody = `Hello BX CLUB,\n\nI am placing a new order. Please find my details below:\n\n--- ORDER DETAILS ---\n${itemsList}\n\nSubtotal: ${sym}${subtotal.toLocaleString()}\nShipping: ${sym}${shipping.toLocaleString()}\nTOTAL TO PAY: ${sym}${totalAmount.toLocaleString()}\n\n--- DELIVERY DETAILS ---\nName: ${firstName} ${lastName}\nEmail: ${email}\nPhone: ${phone}\nAddress: ${address}\nCity: ${city}\nCountry: ${countryName}\nPostal Code: ${postal}\n\nOrder Reference: ${txRef}`;
+
+    const mailtoLink = document.createElement('a');
+    mailtoLink.href = `mailto:bxclubhq@gmail.com?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+    mailtoLink.click();
+    
+    showToast('Email app opened! Please send it, then complete payment.');
+
+    // 3. CALL BACKEND FOR STRIPE URL
+    try {
         const response = await fetch('/api/checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -856,16 +861,7 @@ async function placeOrder(e) {
                     const priceInfo = getCartItemPrice(item);
                     return { ...item, price: priceInfo.price };
                 }),
-                customer: { 
-                    firstName, 
-                    lastName, 
-                    email, 
-                    phone, 
-                    address, 
-                    city, 
-                    country, 
-                    postal 
-                },
+                customer: { firstName, lastName, email, phone, address, city, country, postal },
                 amount: totalAmount,
                 currency: currentCurrency,
                 txRef: txRef
@@ -875,10 +871,10 @@ async function placeOrder(e) {
         const data = await response.json();
 
         if (data.url) {
-            // Wait 1 second to ensure the mail app has opened before redirecting to Stripe
+            // Wait 3 seconds to give the user time to see the email app open and hit send
             setTimeout(() => {
                 window.location.href = data.url;
-            }, 1000);
+            }, 3000);
         } else {
             throw new Error(data.error || 'Failed to create checkout session');
         }
