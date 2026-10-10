@@ -684,7 +684,19 @@ finally { updateCurrencyButtons(); renderProducts(); updateCartUI(); renderMixMa
 function getCartSubtotal() { return cart.reduce((sum, item) => sum + (getCartItemPrice(item).price * item.quantity), 0); }
 function convertFromGBP(amount) { if (currentCurrency === 'GBP') return { price: amount, symbol: '£' }; if (currentCurrency === 'NGN') return { price: Math.round(amount * (exchangeRates['NGN'] || 1800)), symbol: '₦' }; return { price: amount, symbol: '£' }; }
 function convertFromNGN(amount) { if (currentCurrency === 'NGN') return { price: amount, symbol: '' }; const ngnRate = exchangeRates['NGN'] || 1800; const gbpAmount = amount / ngnRate; if (currentCurrency === 'GBP') return { price: Math.round(gbpAmount * 100) / 100, symbol: '£' }; return { price: Math.round(gbpAmount * 100) / 100, symbol: '£' }; }
-function getShippingCost(country) { if (country === 'uk') return convertFromGBP(SHIPPING_UK_GBP); return convertFromNGN(SHIPPING_NIGERIA_NGN); }
+function getShippingCost(country) { 
+    if (country === 'uk') return convertFromGBP(SHIPPING_UK_GBP); 
+    return convertFromNGN(SHIPPING_NIGERIA_NGN); 
+}
+
+// NEW: Smart shipping calculator that applies ₦1000 shipping for the TEST 101 product
+function getEffectiveShipping(country) {
+    const isTestOrder = cart.some(item => item.id === 999);
+    if (isTestOrder) {
+        return currentCurrency === 'NGN' ? { price: 1000, symbol: '₦' } : { price: 0.5, symbol: '£' };
+    }
+    return getShippingCost(country);
+}
 
 function openQuickView(productId) {
 const product = [...products, ...singleProducts].find(p => p.id === productId); if(!product) return;
@@ -744,7 +756,13 @@ document.getElementById('invoiceSubtotal').textContent = symbol + formatPrice(ge
 updateInvoiceShipping(); document.getElementById('shippingInvoiceModal').classList.add('active'); document.body.style.overflow = 'hidden';
 }
 function closeShippingInvoice(e) { if(e && e.target !== e.currentTarget && e.type === 'click') return; document.getElementById('shippingInvoiceModal').classList.remove('active'); document.body.style.overflow = ''; }
-function updateInvoiceShipping() { const country = document.getElementById('invoiceCountry').value; const ship = getShippingCost(country); const symbol = currencySymbols[currentCurrency] || currentCurrency; document.getElementById('invoiceShipping').textContent = ship.symbol + formatPrice(ship.price); document.getElementById('invoiceTotal').textContent = symbol + formatPrice(getCartSubtotal() + ship.price); }
+function updateInvoiceShipping() { 
+    const country = document.getElementById('invoiceCountry').value; 
+    const ship = getEffectiveShipping(country); 
+    const symbol = currencySymbols[currentCurrency] || currentCurrency; 
+    document.getElementById('invoiceShipping').textContent = ship.symbol + formatPrice(ship.price); 
+    document.getElementById('invoiceTotal').textContent = symbol + formatPrice(getCartSubtotal() + ship.price); 
+}
 
 function proceedToPayment() { 
 closeShippingInvoice(); 
@@ -765,7 +783,8 @@ const info = getCartItemPrice(item);
 if (item.isBundle && item.bundleItems) return '<div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.8rem;"><span>' + item.name + '</span><span style="color:#0a0a0a;font-family:\'Oswald\',sans-serif;font-weight:600;">' + info.symbol + formatPrice(info.price * item.quantity) + '</span></div>';
 return '<div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.8rem;"><span>' + item.shortName + ' × ' + item.quantity + '</span><span style="color:#0a0a0a;font-family:\'Oswald\',sans-serif;font-weight:600;">' + info.symbol + formatPrice(info.price * item.quantity) + '</span></div>';
 }).join('');
-const subtotal = getCartSubtotal(); const ship = getShippingCost(country);
+const subtotal = getCartSubtotal(); 
+const ship = getEffectiveShipping(country);
 document.getElementById('paymentSubtotal').textContent = symbol + formatPrice(subtotal);
 document.getElementById('paymentShipping').textContent = ship.symbol + formatPrice(ship.price);
 document.getElementById('paymentTotalAmount').textContent = symbol + formatPrice(subtotal + ship.price);
@@ -790,7 +809,8 @@ async function placeOrder(e) {
     }
 
     const subtotal = getCartSubtotal();
-    const shipping = getShippingCost(country).price;
+    const shippingInfo = getEffectiveShipping(country);
+    const shipping = shippingInfo.price;
     let totalAmount = subtotal + shipping;
     totalAmount = Math.round(totalAmount); 
 
