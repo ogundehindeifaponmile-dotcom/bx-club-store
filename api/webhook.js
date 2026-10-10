@@ -37,6 +37,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: `Webhook Error: ${err.message}` });
     }
 
+    // Only process successful checkout completions
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
       const txRef = session.metadata?.txRef;
@@ -47,14 +48,19 @@ export default async function handler(req, res) {
 
       if (url && token && txRef) {
         try {
-          // 1. Fetch all orders
+          // 1. Fetch all orders from Upstash
           const fetchRes = await fetch(`${url}/lrange/bx_orders/0/-1`, {
             headers: { Authorization: `Bearer ${token}` }
           });
+          
+          if (!fetchRes.ok) {
+            throw new Error(`Failed to fetch orders: ${fetchRes.status}`);
+          }
+          
           const data = await fetchRes.json();
           let orders = (data.result || []).map(o => {
             try { return JSON.parse(o); } catch (e) { return null; }
-          }).filter(Boolean);
+          }).filter(Boolean); // Remove any corrupted entries
 
           // 2. Find and update the specific order
           const orderIndex = orders.findIndex(o => o.txRef === txRef);
@@ -64,12 +70,25 @@ export default async function handler(req, res) {
             orders[orderIndex].verifiedAt = new Date().toISOString();
             
             // 3. Save back to database
-            await fetch(`${url}/del/bx_orders`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
-            await fetch(`${url}/lpush/bx_orders`, {
+            // First, clear the existing list
+            await fetch(`${url}/del/bx_orders`, { 
+              method: 'POST', 
+              headers: { Authorization: `Bearer ${token}` } 
+            });
+            
+            // Then, push the updated orders back
+            // We reverse the array so the chronological order is preserved when LPUSH adds them
+            const stringifiedOrders = orders.reverse().map(o => JSON.stringify(o));
+            const pushRes = await fetch(`${url}/lpush/bx_orders`, {
               method: 'POST',
               headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-              body: JSON.stringify(orders.map(o => JSON.stringify(o)))
+              body: JSON.stringify(stringifiedOrders)
             });
+            
+            if (!pushRes.ok) {
+              throw new Error(`Failed to save orders: ${pushRes.status}`);
+            }
+            console.log('✅ Orders successfully updated in Upstash');
           } else {
             console.warn('⚠️ Order txRef not found in database:', txRef);
           }
@@ -82,17 +101,18 @@ export default async function handler(req, res) {
       try {
         const customerName = session.metadata?.customerName || 'Customer';
         const currencySymbol = session.currency === 'gbp' ? '£' : '₦';
+        const amountFormatted = (session.amount_total / 100).toLocaleString();
         
         await resend.emails.send({
-          from: 'BX CLUB <orders@mg.bxclubhq.com>', // ✅ Uses your newly verified domain!
-          to: [session.customer_email], // ✅ Sends directly to the customer
+          from: 'BX CLUB <orders@mg.bxclubhq.com>', // Uses your verified domain
+          to: [session.customer_email], 
           subject: `✅ Order Confirmed — #${txRef}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #fff; padding: 30px; border-radius: 8px; text-align: center;">
-              <h1 style="color: #FFD700;">Thank You, ${customerName.split(' ')[0]}!</h1>
+              <h1 style="color: #FFD700; margin-top: 0;">Thank You, ${customerName.split(' ')[0]}!</h1>
               <p style="color: #888;">Your order #${txRef} has been received and is being prepared.</p>
               <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; margin-top: 20px;">
-                <p style="color: #FFD700; font-size: 24px; font-weight: bold; margin: 0;">${currencySymbol}${(session.amount_total / 100).toLocaleString()}</p>
+                <p style="color: #FFD700; font-size: 24px; font-weight: bold; margin: 0;">${currencySymbol}${amountFormatted}</p>
               </div>
               <p style="color: #666; font-size: 12px; margin-top: 30px;">BX CLUB | Blackxcellencee</p>
             </div>
@@ -101,6 +121,7 @@ export default async function handler(req, res) {
         console.log('📧 Receipt email sent successfully to:', session.customer_email);
       } catch (emailError) {
         console.error('❌ Email failed:', emailError);
+        // Note: If you get a 403 error here, change 'orders@mg.bxclubhq.com' back to 'onboarding@resend.dev'
       }
     }
 
