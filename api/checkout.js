@@ -1,5 +1,7 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { Resend } = require('resend');
+import Stripe from 'stripe';
+import { Resend } from 'resend';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default async function handler(req, res) {
@@ -10,7 +12,6 @@ export default async function handler(req, res) {
     
     const { items, customer, amount, currency, txRef } = req.body;
 
-    // VALIDATE ALL REQUIRED FIELDS
     if (!items || !customer || !amount || !currency || !txRef) {
       console.error('❌ Missing required fields in checkout request');
       return res.status(400).json({ error: 'Missing required fields' });
@@ -21,13 +22,11 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing customer details' });
     }
 
-    // DETERMINE STRIPE CURRENCY
     const stripeCurrency = currency === 'GBP' ? 'gbp' : 'ngn';
     console.log(`💱 Using Stripe currency: ${stripeCurrency}`);
 
-    // BUILD LINE ITEMS
     const lineItems = items.map(item => {
-      const price = Math.round(item.price * 100); // Convert to cents/pence
+      const price = Math.round(item.price * 100);
       console.log(`📦 Item: ${item.shortName || item.name}, Price: ${price}, Qty: ${item.quantity || 1}`);
       
       return {
@@ -43,7 +42,6 @@ export default async function handler(req, res) {
       };
     });
 
-    // CALCULATE SHIPPING
     const subtotal = items.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
     const shippingAmount = amount - subtotal;
     
@@ -60,7 +58,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // CREATE STRIPE SESSION
     console.log('💳 Creating Stripe session...');
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -78,7 +75,6 @@ export default async function handler(req, res) {
     });
     console.log('✅ Stripe session created:', session.id);
 
-    // SAVE ORDER TO UPSTASH KV
     const orderData = { 
       txRef, 
       items, 
@@ -123,11 +119,9 @@ export default async function handler(req, res) {
         console.log('✅ Upstash KV Response:', kvData);
       } catch (kvError) {
         console.error('❌ Failed to save to Upstash KV:', kvError);
-        // Don't fail the checkout if KV save fails - we still have the order in Stripe
       }
     }
 
-    // SEND ADMIN EMAIL
     console.log('📧 Sending admin email via Resend...');
     const currencySymbol = currency === 'GBP' ? '£' : '₦';
     const itemsList = items.map(item => 
@@ -136,9 +130,9 @@ export default async function handler(req, res) {
 
     try {
       const emailRes = await resend.emails.send({
-        from: 'BX CLUB <onboarding@resend.dev>', // ✅ GUARANTEED TO WORK - Resend sandbox
+        from: 'BX CLUB <onboarding@resend.dev>',
         to: ['bxclubhq@gmail.com'],
-        replyTo: customer.email, // ✅ Customer can reply directly
+        replyTo: customer.email,
         subject: `🛍️ New Order Received — ${txRef}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #fff; padding: 30px; border-radius: 8px;">
@@ -163,10 +157,8 @@ export default async function handler(req, res) {
       console.log('✅ Resend email sent successfully:', emailRes);
     } catch (emailError) {
       console.error('❌ Failed to send admin email:', emailError);
-      // Don't fail the checkout if email fails - we still have the order in Stripe and KV
     }
 
-    // RETURN SUCCESS
     console.log('✅ Checkout completed successfully');
     res.status(200).json({ url: session.url });
     
