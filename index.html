@@ -556,7 +556,7 @@ const products = [
 { id: 2, name: "BX CLUB Candle — Midnight in Lagos", shortName: "Candle — Midnight in Lagos", collection: "midnight", type: "candle", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781571548/bcaaea51-cf78-4962-9929-afb4665ea903_mwftya.png", description: "A woody leather candle inspired by Lagos nights.", notes: ["Plum", "Leather", "Sandalwood"] },
 { id: 3, name: "BX CLUB Diffuser — Summer in London", shortName: "Diffuser — Summer in London", collection: "summer", type: "diffuser", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781519410/e64c5794-56a4-4a2d-a66a-3a3e57d8d34a_lltpuq.png", description: "A fruity gourmand diffuser inspired by summer in London.", notes: ["Black Cherry", "Raspberry", "Vanilla"] },
 { id: 4, name: "BX CLUB Diffuser — Midnight in Lagos", shortName: "Diffuser — Midnight in Lagos", collection: "midnight", type: "diffuser", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781519609/6dcc16c1-d477-4b03-9868-792ff0fa46c4_hmqnab.png", description: "A woody leather diffuser inspired by Lagos nights.", notes: ["Plum", "Leather", "Sandalwood"] },
-{ id: 999, name: "TEST 101 — Test Product", shortName: "TEST 101", collection: "test", type: "candle", priceNGN: 2700, priceGBP: 1.5, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781517668/05a944f8-5de4-4e7f-bc2c-2d58086e4c71_iwpcme.png", description: "Test product for checkout and email workflow.", notes: ["Test", "Item"] }
+{ id: 999, name: "TEST 102 — Test Product", shortName: "TEST 102", collection: "test", type: "candle", priceNGN: 1000, priceGBP: 0.55, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781517668/05a944f8-5de4-4e7f-bc2c-2d58086e4c71_iwpcme.png", description: "Test product for checkout and email workflow (No shipping fee).", notes: ["Test", "Item"] }
 ];
 const singleProducts = [
 { id: 101, name: "BX CLUB — Summer in London Collection", shortName: "Summer in London Set", collection: "summer", type: "set", priceNGN: 135000, priceGBP: 75, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1784329241/ChatGPT_Image_Jul_17_2026_04_00_18_PM_ajutoz.png", description: "The complete Summer in London collection.", notes: ["Candle", "Diffuser", "Instruments"] },
@@ -689,11 +689,11 @@ function getShippingCost(country) {
     return convertFromNGN(SHIPPING_NIGERIA_NGN); 
 }
 
-// Smart shipping calculator that applies ₦1000 shipping for the TEST 101 product
+// Smart shipping calculator that applies 0 shipping for the TEST 102 product
 function getEffectiveShipping(country) {
     const isTestOrder = cart.some(item => item.id === 999);
     if (isTestOrder) {
-        return currentCurrency === 'NGN' ? { price: 1000, symbol: '₦' } : { price: 0.5, symbol: '£' };
+        return currentCurrency === 'NGN' ? { price: 0, symbol: '₦' } : { price: 0, symbol: '£' };
     }
     return getShippingCost(country);
 }
