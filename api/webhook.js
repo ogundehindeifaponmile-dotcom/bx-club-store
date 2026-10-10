@@ -1,8 +1,9 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { Resend } = require('resend');
+import Stripe from 'stripe';
+import { Resend } from 'resend';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// CRITICAL: Stripe requires the raw body to verify the signature.
 export const config = { api: { bodyParser: false } };
 
 async function buffer(readable) {
@@ -25,7 +26,7 @@ export default async function handler(req, res) {
 
     if (!webhookSecret) {
       console.error('❌ CRITICAL: STRIPE_WEBHOOK_SECRET is missing in Vercel!');
-      return res.status(200).json({ received: true }); // Return 200 to stop Stripe retries
+      return res.status(200).json({ received: true });
     }
 
     let event;
@@ -37,7 +38,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: `Webhook Error: ${err.message}` });
     }
 
-    // Only process successful checkout completions
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
       const txRef = session.metadata?.txRef;
@@ -48,7 +48,6 @@ export default async function handler(req, res) {
 
       if (url && token && txRef) {
         try {
-          // 1. Fetch all orders from Upstash
           const fetchRes = await fetch(`${url}/lrange/bx_orders/0/-1`, {
             headers: { Authorization: `Bearer ${token}` }
           });
@@ -60,24 +59,19 @@ export default async function handler(req, res) {
           const data = await fetchRes.json();
           let orders = (data.result || []).map(o => {
             try { return JSON.parse(o); } catch (e) { return null; }
-          }).filter(Boolean); // Remove any corrupted entries
+          }).filter(Boolean);
 
-          // 2. Find and update the specific order
           const orderIndex = orders.findIndex(o => o.txRef === txRef);
           if (orderIndex !== -1) {
             console.log('✅ Found order. Updating status to PAID.');
             orders[orderIndex].status = 'paid';
             orders[orderIndex].verifiedAt = new Date().toISOString();
             
-            // 3. Save back to database
-            // First, clear the existing list
             await fetch(`${url}/del/bx_orders`, { 
               method: 'POST', 
               headers: { Authorization: `Bearer ${token}` } 
             });
             
-            // Then, push the updated orders back
-            // We reverse the array so the chronological order is preserved when LPUSH adds them
             const stringifiedOrders = orders.reverse().map(o => JSON.stringify(o));
             const pushRes = await fetch(`${url}/lpush/bx_orders`, {
               method: 'POST',
@@ -97,14 +91,13 @@ export default async function handler(req, res) {
         }
       }
 
-      // 4. Send Customer Receipt Email
       try {
         const customerName = session.metadata?.customerName || 'Customer';
         const currencySymbol = session.currency === 'gbp' ? '£' : '₦';
         const amountFormatted = (session.amount_total / 100).toLocaleString();
         
         await resend.emails.send({
-          from: 'BX CLUB <orders@mg.bxclubhq.com>', // Uses your verified domain
+          from: 'BX CLUB <orders@mg.bxclubhq.com>',
           to: [session.customer_email], 
           subject: `✅ Order Confirmed — #${txRef}`,
           html: `
@@ -121,15 +114,13 @@ export default async function handler(req, res) {
         console.log('📧 Receipt email sent successfully to:', session.customer_email);
       } catch (emailError) {
         console.error('❌ Email failed:', emailError);
-        // Note: If you get a 403 error here, change 'orders@mg.bxclubhq.com' back to 'onboarding@resend.dev'
       }
     }
 
-    // ALWAYS return 200 to Stripe so they stop retrying
     res.status(200).json({ received: true });
 
   } catch (error) {
     console.error('❌ Webhook handler crashed:', error);
-    res.status(200).json({ received: true }); // Still return 200 to stop Stripe emails
+    res.status(200).json({ received: true });
   }
 }
