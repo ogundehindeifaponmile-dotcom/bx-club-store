@@ -556,6 +556,7 @@ const products = [
 { id: 2, name: "BX CLUB Candle — Midnight in Lagos", shortName: "Candle — Midnight in Lagos", collection: "midnight", type: "candle", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781571548/bcaaea51-cf78-4962-9929-afb4665ea903_mwftya.png", description: "A woody leather candle inspired by Lagos nights.", notes: ["Plum", "Leather", "Sandalwood"] },
 { id: 3, name: "BX CLUB Diffuser — Summer in London", shortName: "Diffuser — Summer in London", collection: "summer", type: "diffuser", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781519410/e64c5794-56a4-4a2d-a66a-3a3e57d8d34a_lltpuq.png", description: "A fruity gourmand diffuser inspired by summer in London.", notes: ["Black Cherry", "Raspberry", "Vanilla"] },
 { id: 4, name: "BX CLUB Diffuser — Midnight in Lagos", shortName: "Diffuser — Midnight in Lagos", collection: "midnight", type: "diffuser", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781519609/6dcc16c1-d477-4b03-9868-792ff0fa46c4_hmqnab.png", description: "A woody leather diffuser inspired by Lagos nights.", notes: ["Plum", "Leather", "Sandalwood"] },
+{ id: 999, name: "TEST 101 — Test Product", shortName: "TEST 101", collection: "test", type: "candle", priceNGN: 2700, priceGBP: 1.5, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781517668/05a944f8-5de4-4e7f-bc2c-2d58086e4c71_iwpcme.png", description: "Test product for checkout and email workflow.", notes: ["Test", "Item"] }
 ];
 const singleProducts = [
 { id: 101, name: "BX CLUB — Summer in London Collection", shortName: "Summer in London Set", collection: "summer", type: "set", priceNGN: 135000, priceGBP: 75, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1784329241/ChatGPT_Image_Jul_17_2026_04_00_18_PM_ajutoz.png", description: "The complete Summer in London collection.", notes: ["Candle", "Diffuser", "Instruments"] },
@@ -796,7 +797,23 @@ async function placeOrder(e) {
     const txRef = 'BX-' + Date.now() + '-' + Math.floor(Math.random() * 1000000);
     const submitBtn = document.getElementById('submitOrderBtn');
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Redirecting to Stripe...';
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Preparing Order...';
+
+    const sym = currentCurrency === 'GBP' ? '£' : '₦';
+    const countryName = country === 'uk' ? 'United Kingdom' : 'Nigeria';
+
+    // --- EMAIL WORKAROUND STARTS HERE ---
+    let itemsList = cart.map(item => `- ${item.shortName || item.name} (x${item.quantity})`).join('%0D%0A');
+
+    const mailSubject = `New Order: ${firstName} ${lastName} (${txRef})`;
+    const mailBody = `Hello BX CLUB,%0D%0A%0D%0AI am placing a new order. Please find my details below:%0D%0A%0D%0A--- ORDER DETAILS ---%0D%0A${itemsList}%0D%0A%0D%0ASubtotal: ${sym}${subtotal.toLocaleString()}%0D%0AShipping: ${sym}${shipping.toLocaleString()}%0D%0ATOTAL TO PAY: ${sym}${totalAmount.toLocaleString()}%0D%0A%0D%0A--- DELIVERY DETAILS ---%0D%0AName: ${firstName} ${lastName}%0D%0AEmail: ${email}%0D%0APhone: ${phone}%0D%0AAddress: ${address}%0D%0ACity: ${city}%0D%0ACountry: ${countryName}%0D%0APostal Code: ${postal}%0D%0A%0D%0AOrder Reference: ${txRef}`;
+
+    // Opens their default mail app in a new tab/window
+    window.open(`mailto:bxclubhq@gmail.com?subject=${encodeURIComponent(mailSubject)}&body=${mailBody}`, '_blank');
+    
+    // Show a quick toast message
+    showToast('Please send the email, then complete payment!');
+    // --- EMAIL WORKAROUND ENDS HERE ---
 
     try {
         const orderDetails = {
@@ -838,8 +855,10 @@ async function placeOrder(e) {
         const data = await response.json();
 
         if (data.url) {
-            showToast('Redirecting to secure payment...');
-            window.location.href = data.url;
+            // Wait 1 second to ensure the mail app has opened before redirecting to Stripe
+            setTimeout(() => {
+                window.location.href = data.url;
+            }, 1000);
         } else {
             throw new Error(data.error || 'Failed to create checkout session');
         }
@@ -949,4 +968,3 @@ fetch('/api/track', {
 </div>
 </body>
 </html>
- check index.html also
