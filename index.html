@@ -834,7 +834,6 @@ async function placeOrder(e) {
         const orders = JSON.parse(safeGet('bxclub_orders') || '[]');
         orders.push(orderDetails);
         safeSet('bxclub_orders', JSON.stringify(orders));
-        // Trigger storage event for admin dashboard if open in another tab
         window.dispatchEvent(new StorageEvent('storage', { key: 'bxclub_orders', newValue: JSON.stringify(orders) }));
     } catch (e) {
         console.error('Local storage save failed', e);
@@ -871,7 +870,6 @@ async function placeOrder(e) {
         const data = await response.json();
 
         if (data.url) {
-            // Wait 3 seconds to give the user time to see the email app open and hit send
             setTimeout(() => {
                 window.location.href = data.url;
             }, 3000);
@@ -954,7 +952,6 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 
 <!-- Simple, Reliable Server-Side Tracking -->
 <script>
-// We only send the page info. The server handles the location and timestamp!
 fetch('/api/track', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
