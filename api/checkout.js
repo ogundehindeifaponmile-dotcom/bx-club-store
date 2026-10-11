@@ -1,7 +1,5 @@
-import Stripe from 'stripe';
-import { Resend } from 'resend';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default async function handler(req, res) {
