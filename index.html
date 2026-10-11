@@ -658,99 +658,37 @@ function getCartItemPrice(item) {
     return { price: item.priceGBP, symbol: '£' };
 }
 
-async function placeOrder(e) {
-    e.preventDefault();
-    if(cart.length === 0) { showToast('Your cart is empty'); return; }
-    
-    const firstName = document.getElementById('coFirstName').value.trim();
-    const lastName = document.getElementById('coLastName').value.trim();
-    const email = document.getElementById('coEmail').value.trim();
-    const phone = document.getElementById('coPhone').value.trim();
-    const address = document.getElementById('coAddress').value.trim();
-    const city = document.getElementById('coCity').value.trim();
-    const country = document.getElementById('coCountry').value;
-    const postal = document.getElementById('coPostal').value.trim();
-    
-    if(!firstName || !lastName || !email || !phone || !address || !city || !postal) { 
-        showToast('Please fill in all fields'); return; 
-    }
-
-    const subtotal = getCartSubtotal();
-    const shippingInfo = getEffectiveShipping(country);
-    const shipping = shippingInfo.price;
-    let totalAmount = subtotal + shipping;
-    totalAmount = Math.round(totalAmount); 
-
-    const txRef = 'BX-' + Date.now() + '-' + Math.floor(Math.random() * 1000000);
-    const submitBtn = document.getElementById('submitOrderBtn');
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Processing...';
-
-    const sym = currentCurrency === 'GBP' ? '£' : '₦';
-    const countryName = country === 'uk' ? 'United Kingdom' : 'Nigeria';
-
-    // 1. SAVE TO LOCAL STORAGE
-    const orderDetails = {
-        txRef: txRef, items: cart,
-        customer: { firstName, lastName, email, phone, address, city, country, postal },
-        currency: currentCurrency, amount: totalAmount, subtotal, shippingCost: shipping,
-        paymentMethod: 'stripe', status: 'pending', timestamp: new Date().toISOString()
-    };
-    
-    try {
-        const orders = JSON.parse(safeGet('bxclub_orders') || '[]');
-        orders.push(orderDetails);
-        safeSet('bxclub_orders', JSON.stringify(orders));
-        window.dispatchEvent(new StorageEvent('storage', { key: 'bxclub_orders', newValue: JSON.stringify(orders) }));
-    } catch (e) { console.error('Local storage save failed', e); }
-
-    // 2. CALL BACKEND FOR STRIPE URL FIRST (Crucial Fix)
-    try {
-        const response = await fetch('/api/checkout', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                items: cart.map(item => {
-                    const priceInfo = getCartItemPrice(item);
-                    return { ...item, price: priceInfo.price };
-                }),
-                customer: { firstName, lastName, email, phone, address, city, country, postal },
-                amount: totalAmount,
-                currency: currentCurrency,
-                txRef: txRef
-            })
-        });
-
-        const data = await response.json();
-
-        if (data.url) {
-            // 3. TRIGGER MAILTO (Now that we have the Stripe URL)
-            let itemsList = cart.map(item => `- ${item.shortName || item.name} (x${item.quantity})`).join('\n');
-            const mailSubject = `New Order: ${firstName} ${lastName} (${txRef})`;
-            const mailBody = `Hello BX CLUB,\n\nI am placing a new order.\n\n--- ORDER DETAILS ---\n${itemsList}\n\nSubtotal: ${sym}${subtotal.toLocaleString()}\nShipping: ${sym}${shipping.toLocaleString()}\nTOTAL TO PAY: ${sym}${totalAmount.toLocaleString()}\n\n--- DELIVERY DETAILS ---\nName: ${firstName} ${lastName}\nEmail: ${email}\nPhone: ${phone}\nAddress: ${address}\nCity: ${city}\nCountry: ${countryName}\nPostal Code: ${postal}\n\nOrder Reference: ${txRef}`;
-
-            const mailtoLink = document.createElement('a');
-            mailtoLink.href = `mailto:bxclubhq@gmail.com?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
-            mailtoLink.target = '_blank'; // Opens email in a new tab so it doesn't block the site
-            mailtoLink.click();
-            
-            showToast('Email app opened! Redirecting to payment...');
-
-            // 4. REDIRECT TO STRIPE IMMEDIATELY
-            setTimeout(() => {
-                window.location.href = data.url;
-            }, 1500); // 1.5 seconds is enough time for the email app to trigger
-        } else {
-            throw new Error(data.error || 'Failed to create checkout session');
-        }
-
-    } catch (error) {
-        console.error('Checkout Error:', error);
-        showToast('Payment failed: ' + error.message);
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-lock" style="margin-right:8px;"></i>Continue to Payment';
-    }
+async function detectCurrencyFromIP() {
+const loader = document.getElementById('currencyLoader'); const loaderText = document.getElementById('currencyLoaderText');
+if (isCurrencyManuallyChanged) return;
+try {
+loader.classList.add('show'); loaderText.textContent = 'Detecting your location...';
+let geoData = null;
+try { const r = await fetch('https://ipapi.co/json/'); if (r.ok) geoData = await r.json(); } catch(e) {}
+if (!geoData) { try { const r = await fetch('https://ipwho.is/'); if (r.ok) { const d = await r.json(); if (d.success !== false) geoData = { country_code: d.country_code, country_name: d.country }; } } catch(e) {} }
+if (!geoData || !geoData.country_code) throw new Error('geo failed');
+detectedCountry = geoData.country_code;
+const countryName = geoData.country_name || detectedCountry;
+autoDetectedCurrency = countryCurrencyMap[detectedCountry] || FALLBACK_CURRENCY;
+if (detectedCountry === 'NG') autoDetectedCurrency = 'NGN';
+if (detectedCountry === 'GB') autoDetectedCurrency = 'GBP';
+currentCurrency = autoDetectedCurrency;
+safeSet('bxclub_currency', currentCurrency);
+const symbol = currencySymbols[currentCurrency] || currentCurrency;
+loaderText.textContent = 'Prices shown in ' + currentCurrency;
+setTimeout(() => { loader.classList.remove('show'); showToast('Welcome from ' + countryName + '! Prices in ' + symbol); }, 1500);
+} catch (error) { console.error('Currency detection failed:', error); loader.classList.remove('show'); } 
+finally { updateCurrencyButtons(); renderProducts(); updateCartUI(); renderMixMatchGrid1(); renderMixMatchGrid2(); if (mmSelected1 && mmSelected2) showBundleSummary(); }
 }
+
+function getCartSubtotal() { return cart.reduce((sum, item) => sum + (getCartItemPrice(item).price * item.quantity), 0); }
+function convertFromGBP(amount) { if (currentCurrency === 'GBP') return { price: amount, symbol: '£' }; if (currentCurrency === 'NGN') return { price: Math.round(amount * (exchangeRates['NGN'] || 1800)), symbol: '₦' }; return { price: amount, symbol: '£' }; }
+function convertFromNGN(amount) { if (currentCurrency === 'NGN') return { price: amount, symbol: '' }; const ngnRate = exchangeRates['NGN'] || 1800; const gbpAmount = amount / ngnRate; if (currentCurrency === 'GBP') return { price: Math.round(gbpAmount * 100) / 100, symbol: '£' }; return { price: Math.round(gbpAmount * 100) / 100, symbol: '£' }; }
+function getShippingCost(country) { 
+    if (country === 'uk') return convertFromGBP(SHIPPING_UK_GBP); 
+    return convertFromNGN(SHIPPING_NIGERIA_NGN); 
+}
+
 // Smart shipping calculator that applies 0 shipping for the TEST 102 product
 function getEffectiveShipping(country) {
     const isTestOrder = cart.some(item => item.id === 999);
@@ -879,12 +817,12 @@ async function placeOrder(e) {
     const txRef = 'BX-' + Date.now() + '-' + Math.floor(Math.random() * 1000000);
     const submitBtn = document.getElementById('submitOrderBtn');
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Preparing Order...';
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Processing...';
 
     const sym = currentCurrency === 'GBP' ? '£' : '₦';
     const countryName = country === 'uk' ? 'United Kingdom' : 'Nigeria';
 
-    // 1. SAVE TO LOCAL STORAGE (Guarantees Admin Dashboard can see it even if API lags)
+    // 1. SAVE TO LOCAL STORAGE
     const orderDetails = {
         txRef: txRef, items: cart,
         customer: { firstName, lastName, email, phone, address, city, country, postal },
@@ -897,22 +835,9 @@ async function placeOrder(e) {
         orders.push(orderDetails);
         safeSet('bxclub_orders', JSON.stringify(orders));
         window.dispatchEvent(new StorageEvent('storage', { key: 'bxclub_orders', newValue: JSON.stringify(orders) }));
-    } catch (e) {
-        console.error('Local storage save failed', e);
-    }
+    } catch (e) { console.error('Local storage save failed', e); }
 
-    // 2. TRIGGER MAILTO (Using hidden link click to bypass popup blockers)
-    let itemsList = cart.map(item => `- ${item.shortName || item.name} (x${item.quantity})`).join('\n');
-    const mailSubject = `New Order: ${firstName} ${lastName} (${txRef})`;
-    const mailBody = `Hello BX CLUB,\n\nI am placing a new order. Please find my details below:\n\n--- ORDER DETAILS ---\n${itemsList}\n\nSubtotal: ${sym}${subtotal.toLocaleString()}\nShipping: ${sym}${shipping.toLocaleString()}\nTOTAL TO PAY: ${sym}${totalAmount.toLocaleString()}\n\n--- DELIVERY DETAILS ---\nName: ${firstName} ${lastName}\nEmail: ${email}\nPhone: ${phone}\nAddress: ${address}\nCity: ${city}\nCountry: ${countryName}\nPostal Code: ${postal}\n\nOrder Reference: ${txRef}`;
-
-    const mailtoLink = document.createElement('a');
-    mailtoLink.href = `mailto:bxclubhq@gmail.com?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
-    mailtoLink.click();
-    
-    showToast('Email app opened! Please send it, then complete payment.');
-
-    // 3. CALL BACKEND FOR STRIPE URL
+    // 2. CALL BACKEND FOR STRIPE URL FIRST (Crucial Fix)
     try {
         const response = await fetch('/api/checkout', {
             method: 'POST',
@@ -932,9 +857,22 @@ async function placeOrder(e) {
         const data = await response.json();
 
         if (data.url) {
+            // 3. TRIGGER MAILTO (Now that we have the Stripe URL)
+            let itemsList = cart.map(item => `- ${item.shortName || item.name} (x${item.quantity})`).join('\n');
+            const mailSubject = `New Order: ${firstName} ${lastName} (${txRef})`;
+            const mailBody = `Hello BX CLUB,\n\nI am placing a new order.\n\n--- ORDER DETAILS ---\n${itemsList}\n\nSubtotal: ${sym}${subtotal.toLocaleString()}\nShipping: ${sym}${shipping.toLocaleString()}\nTOTAL TO PAY: ${sym}${totalAmount.toLocaleString()}\n\n--- DELIVERY DETAILS ---\nName: ${firstName} ${lastName}\nEmail: ${email}\nPhone: ${phone}\nAddress: ${address}\nCity: ${city}\nCountry: ${countryName}\nPostal Code: ${postal}\n\nOrder Reference: ${txRef}`;
+
+            const mailtoLink = document.createElement('a');
+            mailtoLink.href = `mailto:bxclubhq@gmail.com?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+            mailtoLink.target = '_blank'; // Opens email in a new tab so it doesn't block the site
+            mailtoLink.click();
+            
+            showToast('Email app opened! Redirecting to payment...');
+
+            // 4. REDIRECT TO STRIPE IMMEDIATELY
             setTimeout(() => {
                 window.location.href = data.url;
-            }, 3000);
+            }, 1500); // 1.5 seconds is enough time for the email app to trigger
         } else {
             throw new Error(data.error || 'Failed to create checkout session');
         }
@@ -1043,5 +981,3 @@ fetch('/api/track', {
 </div>
 </body>
 </html>
-
-
