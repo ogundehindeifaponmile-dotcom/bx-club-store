@@ -1,15 +1,9 @@
 {
   "name": "bx-club-store",
   "version": "1.0.0",
-  "description": "BX CLUB E-commerce Store Backend",
-  "main": "index.js",
+  "description": "BX CLUB E-commerce Store",
   "scripts": {
-    "dev": "vercel dev",
-    "build": "vercel build",
-    "start": "vercel start"
-  },
-  "engines": {
-    "node": ">=18.x"
+    "build": "echo 'No build step required for static HTML'"
   },
   "dependencies": {
     "resend": "^3.2.0",
