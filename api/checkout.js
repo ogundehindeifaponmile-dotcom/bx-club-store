@@ -1,39 +1,51 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { Resend } = require('resend');
-const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Initialize Resend safely
+let resend = null;
+if (process.env.RESEND_API_KEY) {
+  resend = new Resend(process.env.RESEND_API_KEY);
+}
 
 module.exports = async function handler(req, res) {
+  // Allow CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    console.log('✅ Checkout API called. Body:', JSON.stringify(req.body, null, 2));
+    console.log('✅ Checkout API called. Body type:', typeof req.body);
     
-    const { items, customer, amount, currency, txRef } = req.body;
+    // Safely parse body if Vercel passes it as a string
+    let body = req.body;
+    if (typeof body === 'string') {
+      try { body = JSON.parse(body); } 
+      catch (e) { return res.status(400).json({ error: 'Invalid JSON in request body' }); }
+    }
+
+    const { items, customer, amount, currency, txRef } = body;
 
     if (!items || !customer || !amount || !currency || !txRef) {
-      console.error('❌ Missing required fields in checkout request');
+      console.error('❌ Missing required fields:', { items: !!items, customer: !!customer, amount, currency, txRef });
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    if (!customer.email || !customer.firstName || !customer.lastName) {
-      console.error('❌ Missing customer details');
-      return res.status(400).json({ error: 'Missing customer details' });
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error('❌ STRIPE_SECRET_KEY is missing in Vercel Environment Variables!');
+      return res.status(500).json({ error: 'Server configuration error: Missing Stripe Key' });
     }
 
     const stripeCurrency = currency === 'GBP' ? 'gbp' : 'ngn';
-    console.log(`💱 Using Stripe currency: ${stripeCurrency}`);
 
     const lineItems = items.map(item => {
       const price = Math.round((item.price || 0) * 100);
-      console.log(`📦 Item: ${item.shortName || item.name}, Price: ${price}, Qty: ${item.quantity || 1}`);
-      
       return {
         price_data: {
           currency: stripeCurrency,
-          product_data: { 
-            name: item.shortName || item.name, 
-            images: item.image ? [item.image] : [] 
-          },
+          product_data: { name: item.shortName || item.name || 'Product', images: item.image ? [item.image] : [] },
           unit_amount: price,
         },
         quantity: item.quantity || 1,
@@ -43,15 +55,9 @@ module.exports = async function handler(req, res) {
     const subtotal = items.reduce((sum, item) => sum + ((item.price || 0) * (item.quantity || 1)), 0);
     const shippingAmount = amount - subtotal;
     
-    console.log(`💰 Subtotal: ${subtotal}, Shipping: ${shippingAmount}, Total: ${amount}`);
-    
     if (shippingAmount > 0) {
       lineItems.push({
-        price_data: { 
-          currency: stripeCurrency, 
-          product_data: { name: 'Shipping' }, 
-          unit_amount: Math.round(shippingAmount * 100) 
-        },
+        price_data: { currency: stripeCurrency, product_data: { name: 'Shipping' }, unit_amount: Math.round(shippingAmount * 100) },
         quantity: 1,
       });
     }
@@ -64,7 +70,7 @@ module.exports = async function handler(req, res) {
       customer_email: customer.email,
       metadata: { 
         txRef, 
-        customerName: `${customer.firstName} ${customer.lastName}`,
+        customerName: `${customer.firstName || ''} ${customer.lastName || ''}`.trim(),
         amount: amount.toString(),
         currency: currency
       },
@@ -73,92 +79,52 @@ module.exports = async function handler(req, res) {
     });
     console.log('✅ Stripe session created:', session.id);
 
-    const orderData = { 
-      txRef, 
-      items, 
-      customer: {
-        firstName: customer.firstName,
-        lastName: customer.lastName,
-        email: customer.email,
-        phone: customer.phone,
-        address: customer.address || 'N/A',
-        city: customer.city || 'N/A',
-        country: customer.country || 'N/A',
-        postal: customer.postal || 'N/A'
-      },
-      amount, 
-      currency, 
-      status: 'pending', 
-      timestamp: new Date().toISOString() 
-    };
-
-    console.log('💾 Saving to Upstash KV...');
+    // Save to KV (Safely wrapped so it doesn't crash the checkout if it fails)
     const kvUrl = process.env.KV_REST_API_URL;
     const kvToken = process.env.KV_REST_API_TOKEN;
 
-    if (!kvUrl || !kvToken) {
-      console.error('❌ Missing KV Environment Variables!');
-    } else {
+    if (kvUrl && kvToken) {
       try {
-        const kvRes = await fetch(`${kvUrl}/lpush/bx_orders`, {
+        const orderData = { txRef, items, customer, amount, currency, status: 'pending', timestamp: new Date().toISOString() };
+        await fetch(`${kvUrl}/lpush/bx_orders`, {
           method: 'POST',
-          headers: { 
-            Authorization: `Bearer ${kvToken}`, 
-            'Content-Type': 'application/json' 
-          },
+          headers: { Authorization: `Bearer ${kvToken}`, 'Content-Type': 'application/json' },
           body: JSON.stringify([JSON.stringify(orderData)])
         });
-        
-        if (!kvRes.ok) throw new Error(`Upstash KV returned ${kvRes.status}`);
-        
-        const kvData = await kvRes.json();
-        console.log('✅ Upstash KV Response:', kvData);
+        console.log('✅ Saved to Upstash KV');
       } catch (kvError) {
-        console.error('❌ Failed to save to Upstash KV:', kvError);
+        console.error('❌ Failed to save to Upstash KV:', kvError.message);
       }
     }
 
-    console.log('📧 Sending admin email via Resend...');
-    const currencySymbol = currency === 'GBP' ? '£' : '₦';
-    const itemsList = items.map(item => 
-      `<li style="margin-bottom: 8px;">${item.shortName || item.name} × ${item.quantity || 1} — ${currencySymbol}${((item.price || 0) * (item.quantity || 1)).toLocaleString()}</li>`
-    ).join('');
-
-    try {
-      await resend.emails.send({
-        from: 'BX CLUB <onboarding@resend.dev>',
-        to: ['bxclubhq@gmail.com'],
-        replyTo: customer.email,
-        subject: `🛍️ New Order Received — ${txRef}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #fff; padding: 30px; border-radius: 8px;">
-            <h1 style="color: #FFD700; margin-top: 0;">New Order Received!</h1>
-            <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <p style="color: #FFD700; font-size: 18px; font-weight: bold; margin: 0 0 10px 0;">Order #${txRef}</p>
-              <p style="margin: 10px 0;"><strong>Name:</strong> ${customer.firstName} ${customer.lastName}</p>
-              <p style="margin: 10px 0;"><strong>Email:</strong> ${customer.email}</p>
-              <p style="margin: 10px 0;"><strong>Phone:</strong> ${customer.phone}</p>
-              <p style="margin: 10px 0;"><strong>Address:</strong> ${customer.address || 'N/A'}, ${customer.city || 'N/A'}, ${customer.country || 'N/A'} ${customer.postal || 'N/A'}</p>
-            </div>
-            <h3 style="color: #FFD700;">Items Ordered:</h3>
-            <ul style="color: #fff; padding-left: 20px;">${itemsList}</ul>
-            <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; border-left: 4px solid #FFD700; margin-top: 20px;">
-              <p style="margin: 0; font-size: 14px; color: #888;">Total Amount</p>
-              <p style="margin: 5px 0 0 0; font-size: 28px; font-weight: bold; color: #FFD700;">${currencySymbol}${(amount || 0).toLocaleString()}</p>
-            </div>
-          </div>
-        `,
-      });
-      console.log('✅ Resend email sent successfully');
-    } catch (emailError) {
-      console.error('❌ Failed to send admin email:', emailError);
+    // Send Admin Email (Safely wrapped)
+    if (resend) {
+      try {
+        const currencySymbol = currency === 'GBP' ? '£' : '₦';
+        const itemsList = items.map(item => `<li>${item.shortName || item.name} × ${item.quantity || 1} — ${currencySymbol}${((item.price || 0) * (item.quantity || 1)).toLocaleString()}</li>`).join('');
+        await resend.emails.send({
+          from: 'BX CLUB <onboarding@resend.dev>',
+          to: ['bxclubhq@gmail.com'],
+          replyTo: customer.email,
+          subject: `🛍️ New Order Received — ${txRef}`,
+          html: `<h1>New Order: ${txRef}</h1><p>Total: ${currencySymbol}${amount}</p><ul>${itemsList}</ul>`,
+        });
+        console.log('✅ Admin email sent');
+      } catch (emailError) {
+        console.error('❌ Failed to send admin email:', emailError.message);
+      }
     }
 
-    console.log('✅ Checkout completed successfully');
-    res.status(200).json({ url: session.url });
+    // CRITICAL: Always return valid JSON
+    return res.status(200).json({ url: session.url });
     
   } catch (error) {
-    console.error('❌ Checkout API CRASHED:', error);
-    res.status(500).json({ error: error.message || 'Internal server error' });
+    console.error('❌ Checkout API CRASHED:', error.message);
+    // CRITICAL: Return JSON even on crash to prevent frontend "Unexpected token" errors
+    return res.status(500).json({ error: error.message || 'Internal server error' });
   }
 }
+
+module.exports.config = {
+  api: { bodyParser: true }
+};
