@@ -1,6 +1,10 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { Resend } = require('resend');
-const resend = new Resend(process.env.RESEND_API_KEY);
+
+let resend = null;
+if (process.env.RESEND_API_KEY) {
+  resend = new Resend(process.env.RESEND_API_KEY);
+}
 
 async function buffer(readable) {
   const chunks = [];
@@ -11,9 +15,7 @@ async function buffer(readable) {
 }
 
 async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
     const buf = await buffer(req);
@@ -21,7 +23,7 @@ async function handler(req, res) {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
     if (!webhookSecret) {
-      console.error('❌ CRITICAL: STRIPE_WEBHOOK_SECRET is missing in Vercel!');
+      console.error('❌ CRITICAL: STRIPE_WEBHOOK_SECRET is missing!');
       return res.status(200).json({ received: true });
     }
 
@@ -44,11 +46,8 @@ async function handler(req, res) {
 
       if (url && token && txRef) {
         try {
-          const fetchRes = await fetch(`${url}/lrange/bx_orders/0/-1`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          
-          if (!fetchRes.ok) throw new Error(`Failed to fetch orders: ${fetchRes.status}`);
+          const fetchRes = await fetch(`${url}/lrange/bx_orders/0/-1`, { headers: { Authorization: `Bearer ${token}` } });
+          if (!fetchRes.ok) throw new Error(`Failed to fetch: ${fetchRes.status}`);
           
           const data = await fetchRes.json();
           let orders = (data.result || []).map(o => {
@@ -61,10 +60,7 @@ async function handler(req, res) {
             orders[orderIndex].status = 'paid';
             orders[orderIndex].verifiedAt = new Date().toISOString();
             
-            await fetch(`${url}/del/bx_orders`, { 
-              method: 'POST', 
-              headers: { Authorization: `Bearer ${token}` } 
-            });
+            await fetch(`${url}/del/bx_orders`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
             
             const stringifiedOrders = orders.reverse().map(o => JSON.stringify(o));
             const pushRes = await fetch(`${url}/lpush/bx_orders`, {
@@ -73,50 +69,40 @@ async function handler(req, res) {
               body: JSON.stringify(stringifiedOrders)
             });
             
-            if (!pushRes.ok) throw new Error(`Failed to save orders: ${pushRes.status}`);
+            if (!pushRes.ok) throw new Error(`Failed to push: ${pushRes.status}`);
             console.log('✅ Orders successfully updated in Upstash');
-          } else {
-            console.warn('⚠️ Order txRef not found in database:', txRef);
           }
         } catch (dbError) {
-          console.error('❌ Database update failed:', dbError);
+          console.error('❌ Database update failed:', dbError.message);
         }
       }
 
-      try {
-        const customerName = session.metadata?.customerName || 'Customer';
-        const currencySymbol = session.currency === 'gbp' ? '£' : '₦';
-        const amountFormatted = ((session.amount_total || 0) / 100).toLocaleString();
-        
-        await resend.emails.send({
-          from: 'BX CLUB <orders@mg.bxclubhq.com>',
-          to: [session.customer_email], 
-          subject: `✅ Order Confirmed — #${txRef}`,
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #fff; padding: 30px; border-radius: 8px; text-align: center;">
-              <h1 style="color: #FFD700; margin-top: 0;">Thank You, ${customerName.split(' ')[0]}!</h1>
-              <p style="color: #888;">Your order #${txRef} has been received and is being prepared.</p>
-              <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; margin-top: 20px;">
-                <p style="color: #FFD700; font-size: 24px; font-weight: bold; margin: 0;">${currencySymbol}${amountFormatted}</p>
-              </div>
-              <p style="color: #666; font-size: 12px; margin-top: 30px;">BX CLUB | Blackxcellencee</p>
-            </div>
-          `,
-        });
-        console.log('📧 Receipt email sent successfully to:', session.customer_email);
-      } catch (emailError) {
-        console.error('❌ Email failed:', emailError);
+      if (resend && session.customer_email) {
+        try {
+          const customerName = session.metadata?.customerName || 'Customer';
+          const currencySymbol = session.currency === 'gbp' ? '£' : '₦';
+          const amountFormatted = ((session.amount_total || 0) / 100).toLocaleString();
+          
+          await resend.emails.send({
+            from: 'BX CLUB <orders@mg.bxclubhq.com>',
+            to: [session.customer_email], 
+            subject: `✅ Order Confirmed — #${txRef}`,
+            html: `<h1 style="color:#FFD700">Thank You!</h1><p>Order #${txRef} confirmed.</p><p>Total: ${currencySymbol}${amountFormatted}</p>`,
+          });
+          console.log('📧 Receipt email sent');
+        } catch (emailError) {
+          console.error('❌ Email failed:', emailError.message);
+        }
       }
     }
 
-    res.status(200).json({ received: true });
+    return res.status(200).json({ received: true });
 
   } catch (error) {
-    console.error('❌ Webhook handler crashed:', error);
-    res.status(200).json({ received: true });
+    console.error('❌ Webhook handler crashed:', error.message);
+    return res.status(200).json({ received: true }); // Always return 200 to Stripe
   }
 }
 
-// Properly attach config to the handler in CommonJS
 handler.config = { api: { bodyParser: false } };
 module.exports = handler;
