@@ -2,16 +2,6 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export const config = { api: { bodyParser: false } };
-
-async function buffer(readable) {
-  // ... rest of the code
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { Resend } = require('resend');
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-export const config = { api: { bodyParser: false } };
-
 async function buffer(readable) {
   const chunks = [];
   for await (const chunk of readable) {
@@ -20,7 +10,7 @@ async function buffer(readable) {
   return Buffer.concat(chunks);
 }
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -58,9 +48,7 @@ export default async function handler(req, res) {
             headers: { Authorization: `Bearer ${token}` }
           });
           
-          if (!fetchRes.ok) {
-            throw new Error(`Failed to fetch orders: ${fetchRes.status}`);
-          }
+          if (!fetchRes.ok) throw new Error(`Failed to fetch orders: ${fetchRes.status}`);
           
           const data = await fetchRes.json();
           let orders = (data.result || []).map(o => {
@@ -85,9 +73,7 @@ export default async function handler(req, res) {
               body: JSON.stringify(stringifiedOrders)
             });
             
-            if (!pushRes.ok) {
-              throw new Error(`Failed to save orders: ${pushRes.status}`);
-            }
+            if (!pushRes.ok) throw new Error(`Failed to save orders: ${pushRes.status}`);
             console.log('✅ Orders successfully updated in Upstash');
           } else {
             console.warn('⚠️ Order txRef not found in database:', txRef);
@@ -100,7 +86,7 @@ export default async function handler(req, res) {
       try {
         const customerName = session.metadata?.customerName || 'Customer';
         const currencySymbol = session.currency === 'gbp' ? '£' : '₦';
-        const amountFormatted = (session.amount_total / 100).toLocaleString();
+        const amountFormatted = ((session.amount_total || 0) / 100).toLocaleString();
         
         await resend.emails.send({
           from: 'BX CLUB <orders@mg.bxclubhq.com>',
@@ -130,3 +116,7 @@ export default async function handler(req, res) {
     res.status(200).json({ received: true });
   }
 }
+
+// Properly attach config to the handler in CommonJS
+handler.config = { api: { bodyParser: false } };
+module.exports = handler;
