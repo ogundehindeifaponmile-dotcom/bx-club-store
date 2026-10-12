@@ -2,13 +2,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export default async function handler(req, res) {
-  // ... rest of the code
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { Resend } = require('resend');
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
@@ -30,7 +24,7 @@ export default async function handler(req, res) {
     console.log(`💱 Using Stripe currency: ${stripeCurrency}`);
 
     const lineItems = items.map(item => {
-      const price = Math.round(item.price * 100);
+      const price = Math.round((item.price || 0) * 100);
       console.log(`📦 Item: ${item.shortName || item.name}, Price: ${price}, Qty: ${item.quantity || 1}`);
       
       return {
@@ -46,7 +40,7 @@ export default async function handler(req, res) {
       };
     });
 
-    const subtotal = items.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
+    const subtotal = items.reduce((sum, item) => sum + ((item.price || 0) * (item.quantity || 1)), 0);
     const shippingAmount = amount - subtotal;
     
     console.log(`💰 Subtotal: ${subtotal}, Shipping: ${shippingAmount}, Total: ${amount}`);
@@ -115,9 +109,7 @@ export default async function handler(req, res) {
           body: JSON.stringify([JSON.stringify(orderData)])
         });
         
-        if (!kvRes.ok) {
-          throw new Error(`Upstash KV returned ${kvRes.status}`);
-        }
+        if (!kvRes.ok) throw new Error(`Upstash KV returned ${kvRes.status}`);
         
         const kvData = await kvRes.json();
         console.log('✅ Upstash KV Response:', kvData);
@@ -129,11 +121,11 @@ export default async function handler(req, res) {
     console.log('📧 Sending admin email via Resend...');
     const currencySymbol = currency === 'GBP' ? '£' : '₦';
     const itemsList = items.map(item => 
-      `<li style="margin-bottom: 8px;">${item.shortName || item.name} × ${item.quantity} — ${currencySymbol}${(item.price * item.quantity).toLocaleString()}</li>`
+      `<li style="margin-bottom: 8px;">${item.shortName || item.name} × ${item.quantity || 1} — ${currencySymbol}${((item.price || 0) * (item.quantity || 1)).toLocaleString()}</li>`
     ).join('');
 
     try {
-      const emailRes = await resend.emails.send({
+      await resend.emails.send({
         from: 'BX CLUB <onboarding@resend.dev>',
         to: ['bxclubhq@gmail.com'],
         replyTo: customer.email,
@@ -152,13 +144,12 @@ export default async function handler(req, res) {
             <ul style="color: #fff; padding-left: 20px;">${itemsList}</ul>
             <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; border-left: 4px solid #FFD700; margin-top: 20px;">
               <p style="margin: 0; font-size: 14px; color: #888;">Total Amount</p>
-              <p style="margin: 5px 0 0 0; font-size: 28px; font-weight: bold; color: #FFD700;">${currencySymbol}${amount.toLocaleString()}</p>
+              <p style="margin: 5px 0 0 0; font-size: 28px; font-weight: bold; color: #FFD700;">${currencySymbol}${(amount || 0).toLocaleString()}</p>
             </div>
-            <p style="margin-top: 20px; font-size: 12px; color: #666;">This order is pending payment confirmation via Stripe.</p>
           </div>
         `,
       });
-      console.log('✅ Resend email sent successfully:', emailRes);
+      console.log('✅ Resend email sent successfully');
     } catch (emailError) {
       console.error('❌ Failed to send admin email:', emailError);
     }
@@ -168,7 +159,6 @@ export default async function handler(req, res) {
     
   } catch (error) {
     console.error('❌ Checkout API CRASHED:', error);
-    console.error('❌ Error stack:', error.stack);
     res.status(500).json({ error: error.message || 'Internal server error' });
   }
 }
