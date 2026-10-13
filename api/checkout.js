@@ -1,41 +1,33 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { Resend } = require('resend');
-
-// Initialize Resend safely
-let resend = null;
-if (process.env.RESEND_API_KEY) {
-  resend = new Resend(process.env.RESEND_API_KEY);
-}
 
 module.exports = async function handler(req, res) {
   // Allow CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    console.log('✅ Checkout API called. Body type:', typeof req.body);
+    // 1. SAFELY CHECK FOR STRIPE KEY (This prevents the crash!)
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return res.status(500).json({ error: 'Server Error: STRIPE_SECRET_KEY is missing in Vercel Environment Variables.' });
+    }
     
-    // Safely parse body if Vercel passes it as a string
+    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+    const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+
+    // 2. Parse Body
     let body = req.body;
     if (typeof body === 'string') {
       try { body = JSON.parse(body); } 
-      catch (e) { return res.status(400).json({ error: 'Invalid JSON in request body' }); }
+      catch (e) { return res.status(400).json({ error: 'Invalid JSON' }); }
     }
 
     const { items, customer, amount, currency, txRef } = body;
 
     if (!items || !customer || !amount || !currency || !txRef) {
-      console.error('❌ Missing required fields:', { items: !!items, customer: !!customer, amount, currency, txRef });
       return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    if (!process.env.STRIPE_SECRET_KEY) {
-      console.error('❌ STRIPE_SECRET_KEY is missing in Vercel Environment Variables!');
-      return res.status(500).json({ error: 'Server configuration error: Missing Stripe Key' });
     }
 
     const stripeCurrency = currency === 'GBP' ? 'gbp' : 'ngn';
@@ -62,7 +54,7 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    console.log('💳 Creating Stripe session...');
+    // 3. Create Stripe Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: lineItems,
@@ -77,9 +69,8 @@ module.exports = async function handler(req, res) {
       success_url: `${req.headers.origin || 'https://bxclubhq.com'}?success=true&order=${txRef}`,
       cancel_url: `${req.headers.origin || 'https://bxclubhq.com'}?canceled=true`,
     });
-    console.log('✅ Stripe session created:', session.id);
 
-    // Save to KV (Safely wrapped so it doesn't crash the checkout if it fails)
+    // 4. Save to Database (Safely wrapped)
     const kvUrl = process.env.KV_REST_API_URL;
     const kvToken = process.env.KV_REST_API_TOKEN;
 
@@ -91,40 +82,32 @@ module.exports = async function handler(req, res) {
           headers: { Authorization: `Bearer ${kvToken}`, 'Content-Type': 'application/json' },
           body: JSON.stringify([JSON.stringify(orderData)])
         });
-        console.log('✅ Saved to Upstash KV');
       } catch (kvError) {
-        console.error('❌ Failed to save to Upstash KV:', kvError.message);
+        console.error('KV Error:', kvError.message);
       }
     }
 
-    // Send Admin Email (Safely wrapped)
+    // 5. Send Email (Safely wrapped)
     if (resend) {
       try {
-        const currencySymbol = currency === 'GBP' ? '£' : '₦';
-        const itemsList = items.map(item => `<li>${item.shortName || item.name} × ${item.quantity || 1} — ${currencySymbol}${((item.price || 0) * (item.quantity || 1)).toLocaleString()}</li>`).join('');
+        const currencySymbol = currency === 'GBP' ? '£' : '';
         await resend.emails.send({
           from: 'BX CLUB <onboarding@resend.dev>',
           to: ['bxclubhq@gmail.com'],
           replyTo: customer.email,
           subject: `🛍️ New Order Received — ${txRef}`,
-          html: `<h1>New Order: ${txRef}</h1><p>Total: ${currencySymbol}${amount}</p><ul>${itemsList}</ul>`,
+          html: `<h1>New Order: ${txRef}</h1><p>Total: ${currencySymbol}${amount}</p>`,
         });
-        console.log('✅ Admin email sent');
       } catch (emailError) {
-        console.error('❌ Failed to send admin email:', emailError.message);
+        console.error('Email Error:', emailError.message);
       }
     }
 
-    // CRITICAL: Always return valid JSON
+    // 6. Return Success
     return res.status(200).json({ url: session.url });
     
   } catch (error) {
-    console.error('❌ Checkout API CRASHED:', error.message);
-    // CRITICAL: Return JSON even on crash to prevent frontend "Unexpected token" errors
+    console.error('API Crash:', error.message);
     return res.status(500).json({ error: error.message || 'Internal server error' });
   }
 }
-
-module.exports.config = {
-  api: { bodyParser: true }
-};
