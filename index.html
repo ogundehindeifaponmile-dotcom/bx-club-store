@@ -789,7 +789,9 @@ document.getElementById('paymentShipping').textContent = ship.symbol + formatPri
 document.getElementById('paymentTotalAmount').textContent = symbol + formatPrice(subtotal + ship.price);
 }
 
-// ==================== BULLETPROOF CHECKOUT ====================
+// ==================== BULLETPROOF 2-STEP CHECKOUT ====================
+let pendingOrderData = null;
+
 async function placeOrder(e) {
     e.preventDefault();
     if(cart.length === 0) { showToast('Your cart is empty'); return; }
@@ -814,71 +816,134 @@ async function placeOrder(e) {
     totalAmount = Math.round(totalAmount); 
 
     const txRef = 'BX-' + Date.now() + '-' + Math.floor(Math.random() * 1000000);
-    const submitBtn = document.getElementById('submitOrderBtn');
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Preparing...';
-
     const sym = currentCurrency === 'GBP' ? '£' : '₦';
     const countryName = country === 'uk' ? 'United Kingdom' : 'Nigeria';
 
-    // 1. Generate Email Content
+    // Save order details globally for the 2nd step
+    pendingOrderData = {
+        txRef, firstName, lastName, email, phone, address, city, country, postal,
+        totalAmount, sym, countryName, subtotal, shipping
+    };
+
+    // Save to local storage immediately for Admin Dashboard fallback
+    const orderDetails = {
+        txRef: txRef, items: cart,
+        customer: { firstName, lastName, email, phone, address, city, country, postal },
+        currency: currentCurrency, amount: totalAmount, subtotal, shippingCost: shipping,
+        paymentMethod: 'stripe', status: 'pending', timestamp: new Date().toISOString()
+    };
+    
+    try {
+        const orders = JSON.parse(safeGet('bxclub_orders') || '[]');
+        orders.push(orderDetails);
+        safeSet('bxclub_orders', JSON.stringify(orders));
+        window.dispatchEvent(new StorageEvent('storage', { key: 'bxclub_orders', newValue: JSON.stringify(orders) }));
+    } catch (e) { console.error('Local storage save failed', e); }
+
+    // Show the custom 2-step instruction modal
+    showCheckoutModal();
+}
+
+function showCheckoutModal() {
+    const existing = document.getElementById('checkout-instruction-modal');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'checkout-instruction-modal';
+    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(4px);';
+    
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#111; border:2px solid #FFD700; border-radius:12px; padding:30px; max-width:500px; width:100%; text-align:center; color:#fff; font-family: Inter, sans-serif; box-shadow: 0 10px 40px rgba(0,0,0,0.5);';
+    
+    box.innerHTML = `
+        <div style="font-size:2.5rem; margin-bottom:15px;">⚠️</div>
+        <h2 style="color:#FFD700; margin:0 0 15px 0; font-family:Oswald, sans-serif; font-size:1.5rem; text-transform:uppercase;">Important Checkout Step</h2>
+        <p style="line-height:1.6; margin-bottom:25px; font-size:0.95rem; color:#ccc;">
+            Due to temporary recording updates, please ensure you <strong>send the order email first</strong>. <br><br>
+            Once sent, return to this page and click the button below to finalize your payment securely via Stripe.
+        </p>
+        
+        <button onclick="triggerEmailSend()" style="display:block; width:100%; padding:16px; background:#333; color:#fff; border:1px solid #555; font-weight:bold; border-radius:8px; margin-bottom:15px; font-size:1rem; cursor:pointer; transition:all 0.2s;">
+            📧 Step 1: Open & Send Order Email
+        </button>
+        
+        <button onclick="finalizeStripePayment()" style="display:block; width:100%; padding:16px; background:#635BFF; color:#fff; border:none; font-weight:bold; border-radius:8px; font-size:1.1rem; cursor:pointer; transition:all 0.2s; box-shadow: 0 4px 15px rgba(99, 91, 255, 0.4);">
+            💳 Step 2: Continue to Secure Payment
+        </button>
+        
+        <button onclick="document.getElementById('checkout-instruction-modal').remove()" style="background:none; border:none; color:#888; margin-top:20px; cursor:pointer; text-decoration:underline; font-size:0.85rem;">
+            Cancel and return to cart
+        </button>
+    `;
+    
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+}
+
+function triggerEmailSend() {
+    if (!pendingOrderData) return;
+    const { txRef, firstName, lastName, email, phone, address, city, countryName, postal, totalAmount, sym, subtotal, shipping } = pendingOrderData;
+    
     let itemsList = cart.map(item => `- ${item.shortName || item.name} (x${item.quantity})`).join('\n');
     const mailSubject = `New Order: ${firstName} ${lastName} (${txRef})`;
     const mailBody = `Hello BX CLUB,\n\nI am placing a new order.\n\n--- ORDER DETAILS ---\n${itemsList}\n\nSubtotal: ${sym}${subtotal.toLocaleString()}\nShipping: ${sym}${shipping.toLocaleString()}\nTOTAL TO PAY: ${sym}${totalAmount.toLocaleString()}\n\n--- DELIVERY DETAILS ---\nName: ${firstName} ${lastName}\nEmail: ${email}\nPhone: ${phone}\nAddress: ${address}\nCity: ${city}\nCountry: ${countryName}\nPostal Code: ${postal}\n\nOrder Reference: ${txRef}`;
 
-    // 2. Open Email App Immediately
     window.location.href = `mailto:bxclubhq@gmail.com?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+    
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '✅ Email App Opened!';
+    btn.style.background = '#1a472a';
+    btn.style.borderColor = '#4ade80';
+    btn.style.color = '#4ade80';
+    
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.style.background = '#333';
+        btn.style.borderColor = '#555';
+        btn.style.color = '#fff';
+    }, 3000);
+}
 
-    // 3. Try to get Stripe Link in the background (If it fails, we have a backup plan)
-    let stripeUrl = null;
+async function finalizeStripePayment() {
+    if (!pendingOrderData) return;
+    const btn = event.target;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    btn.disabled = true;
+
     try {
         const response = await fetch('/api/checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 items: cart.map(item => ({ ...item, price: getCartItemPrice(item).price })),
-                customer: { firstName, lastName, email, phone, address, city, country, postal },
-                amount: totalAmount,
+                customer: { 
+                    firstName: pendingOrderData.firstName, 
+                    lastName: pendingOrderData.lastName, 
+                    email: pendingOrderData.email, 
+                    phone: pendingOrderData.phone, 
+                    address: pendingOrderData.address, 
+                    city: pendingOrderData.city, 
+                    country: pendingOrderData.country, 
+                    postal: pendingOrderData.postal 
+                },
+                amount: pendingOrderData.totalAmount,
                 currency: currentCurrency,
-                txRef: txRef
+                txRef: pendingOrderData.txRef
             })
         });
         const data = await response.json();
-        if (data.url) stripeUrl = data.url;
-    } catch (err) {
-        console.log('Backend fetch skipped (using fallback)');
+        if (data.url) {
+            window.location.href = data.url;
+        } else {
+            throw new Error(data.error || 'Failed to create checkout session');
+        }
+    } catch (error) {
+        console.error('Checkout Error:', error);
+        alert('Payment link generation failed. Please try again or contact us on WhatsApp.');
+        btn.innerHTML = '💳 Step 2: Continue to Secure Payment';
+        btn.disabled = false;
     }
-
-    // 4. Show a Simple, Clear Instruction Screen to the customer
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = '<i class="fas fa-lock" style="margin-right:8px;"></i>Continue to Payment';
-    
-    const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px;';
-    
-    const box = document.createElement('div');
-    box.style.cssText = 'background:#111; border:2px solid #FFD700; border-radius:12px; padding:30px; max-width:500px; width:100%; text-align:center; color:#fff; font-family: Inter, sans-serif;';
-    
-    let buttonHtml = '';
-    if (stripeUrl) {
-        buttonHtml = `<a href="${stripeUrl}" style="display:block; width:100%; padding:16px; background:#635BFF; color:#fff; text-decoration:none; font-weight:bold; border-radius:8px; margin-top:20px; font-size:1.1rem;">💳 Click Here to Pay Securely via Stripe</a>`;
-    } else {
-        buttonHtml = `<p style="color:#ccc; margin-top:20px; font-size:0.95rem; line-height:1.5;">Our payment link is generating. Please send the email, then click below to get your secure payment link instantly via WhatsApp.</p>
-        <a href="https://wa.me/447538277711?text=Hi, I just sent an order email for ${txRef}. Please send me the secure payment link." style="display:block; width:100%; padding:16px; background:#25D366; color:#fff; text-decoration:none; font-weight:bold; border-radius:8px; margin-top:20px; font-size:1.1rem;">💬 Get Payment Link via WhatsApp</a>`;
-    }
-
-    box.innerHTML = `
-        <h2 style="color:#FFD700; margin-top:0; font-family:Oswald, sans-serif; font-size:1.6rem;">✅ Email Draft Opened!</h2>
-        <p style="line-height:1.6; margin-bottom:20px; font-size:1rem;">
-            <strong>Step 1:</strong> Please hit "Send" in the email app that just opened.<br><br>
-            <strong>Step 2:</strong> Once sent, complete your payment below.
-        </p>
-        ${buttonHtml}
-        <button onclick="this.parentElement.parentElement.remove()" style="background:none; border:none; color:#888; margin-top:25px; cursor:pointer; text-decoration:underline; font-size:0.9rem;">Close this message</button>
-    `;
-    
-    overlay.appendChild(box);
-    document.body.appendChild(overlay);
 }
 
 function renderFAQs() { document.getElementById('faqList').innerHTML = faqs.map((faq, i) => '<div class="faq-item" id="faq-' + i + '"><button class="faq-question" onclick="toggleFAQ(' + i + ')">' + faq.q + '<i class="fas fa-chevron-down" style="font-size:0.7rem;color:#0a0a0a;"></i></button><div class="faq-answer"><p>' + faq.a + '</p></div></div>').join(''); }
