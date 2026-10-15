@@ -932,15 +932,24 @@ async function finalizeStripePayment() {
                 txRef: pendingOrderData.txRef
             })
         });
+        
+        // Check if the response is actually JSON before parsing
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            const text = await response.text();
+            throw new Error(`Server returned HTML instead of JSON (Status: ${response.status}). Check if api/checkout.js is in the correct folder.`);
+        }
+
         const data = await response.json();
-        if (data.url) {
+        
+        if (response.ok && data.url) {
             window.location.href = data.url;
         } else {
-            throw new Error(data.error || 'Failed to create checkout session');
+            throw new Error(data.error || `Server returned status ${response.status}`);
         }
     } catch (error) {
-        console.error('Checkout Error:', error);
-        alert('Payment link generation failed. Please try again or contact us on WhatsApp.');
+        console.error('Checkout Error Details:', error);
+        alert('ERROR: ' + error.message + '\n\nPlease check the browser console (F12) and ensure api/checkout.js is inside the "api" folder in GitHub.');
         btn.innerHTML = '💳 Step 2: Continue to Secure Payment';
         btn.disabled = false;
     }
