@@ -6,62 +6,31 @@ export default async function handler(req, res) {
     const token = process.env.KV_REST_API_TOKEN;
 
     if (!url || !token) {
-      console.error('❌ Missing KV Environment Variables');
+      console.error('Missing KV Environment Variables');
       return res.status(500).json({ error: 'Database configuration missing', orders: [], visits: [] });
     }
 
-    // 1. Fetch orders
-    console.log('📥 Fetching orders from Upstash...');
+    // Fetch orders
     const ordersRes = await fetch(`${url}/lrange/bx_orders/0/-1`, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    
-    if (!ordersRes.ok) {
-      throw new Error(`Failed to fetch orders: ${ordersRes.status} ${ordersRes.statusText}`);
-    }
-    
     const ordersData = await ordersRes.json();
-    console.log('📦 Raw orders data received');
-    
-    const orders = (ordersData.result || []).map(orderStr => {
-      try { 
-        return JSON.parse(orderStr); 
-      } catch (e) { 
-        console.error('❌ Failed to parse order string:', orderStr, e);
-        return null; 
-      }
-    }).filter(Boolean); // Removes any null/failed parses
+    const orders = (ordersData.result || []).map(order => {
+      try { return JSON.parse(order); } catch (e) { return null; }
+    }).filter(Boolean);
 
-    // 2. Fetch visits
-    console.log('📥 Fetching visits from Upstash...');
+    // Fetch visits
     const visitsRes = await fetch(`${url}/lrange/bx_visits/0/-1`, {
       headers: { Authorization: `Bearer ${token}` }
     });
-
-    if (!visitsRes.ok) {
-      throw new Error(`Failed to fetch visits: ${visitsRes.status} ${visitsRes.statusText}`);
-    }
-
     const visitsData = await visitsRes.json();
-    console.log('📦 Raw visits data received');
-    
-    const visits = (visitsData.result || []).map(visitStr => {
-      try { 
-        return JSON.parse(visitStr); 
-      } catch (e) { 
-        console.error('❌ Failed to parse visit string:', visitStr, e);
-        return null; 
-      }
+    const visits = (visitsData.result || []).map(visit => {
+      try { return JSON.parse(visit); } catch (e) { return null; }
     }).filter(Boolean);
 
-    console.log(`✅ Successfully fetched ${orders.length} orders and ${visits.length} visits`);
-    
-    // Return the clean data to the frontend
     res.status(200).json({ orders, visits });
-    
   } catch (error) {
-    console.error('❌ API Orders Fetch Error:', error);
-    // Return 200 with empty arrays so the frontend doesn't crash, but logs the error
-    res.status(200).json({ error: error.message, orders: [], visits: [] });
+    console.error('API Orders Fetch Error:', error);
+    res.status(500).json({ error: error.message, orders: [], visits: [] });
   }
 }
