@@ -38,7 +38,6 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: #f5f5f5; }
 ::-webkit-scrollbar-thumb { background: #0a0a0a; }
-
 .hero-carousel { position: relative; width: 100%; height: 100vh; min-height: 600px; overflow: hidden; }
 .hero-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.8s ease; display: flex; align-items: center; justify-content: center; }
 .hero-slide.active { opacity: 1; z-index: 2; }
@@ -52,7 +51,6 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .carousel-dots { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 6; }
 .carousel-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.3s ease; }
 .carousel-dot.active { background: #0a0a0a; transform: scale(1.2); }
-
 .main-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: transparent; border-bottom: none; transition: transform 0.4s ease, background 0.3s ease; }
 .main-nav.hidden { transform: translateY(-100%); }
 .main-nav.scrolled { background: rgba(255,255,255,0.98); backdrop-filter: blur(10px); box-shadow: 0 2px 20px rgba(0,0,0,0.08); }
@@ -70,7 +68,6 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .mobile-nav { display: none; position: fixed; top: 60px; left: 0; right: 0; background: #fff; border-bottom: 1px solid #e5e5e5; padding: 20px; z-index: 49; }
 .mobile-nav.open { display: block; }
 .mobile-nav a { display: block; padding: 12px 0; font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; color: #0a0a0a; text-decoration: none; border-bottom: 1px solid #f5f5f5; font-family: 'Oswald', sans-serif; font-weight: 500; }
-
 .section-heading { text-align: center; margin-bottom: 3rem; }
 .section-heading h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 400; margin-bottom: 0.5rem; }
 .section-heading p { font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: #888; }
@@ -86,7 +83,6 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .product-card:hover .add-btn { opacity: 1 !important; }
 .add-btn { background: #0a0a0a !important; color: #fff !important; font-family: 'Oswald', sans-serif; font-weight: 600; }
 .add-btn:hover { background: #333 !important; }
-
 .category-banner { position: relative; overflow: hidden; aspect-ratio: 16/9; cursor: pointer; }
 .category-banner img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s ease; }
 .category-banner:hover img { transform: scale(1.05); }
@@ -94,7 +90,6 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .category-banner h3 { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 400; margin-bottom: 1rem; }
 .category-banner .shop-link { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: #fff; text-decoration: none; border-bottom: 1px solid #fff; padding-bottom: 4px; transition: all 0.3s ease; }
 .category-banner .shop-link:hover { border-color: #0a0a0a; }
-
 .faq-item { border-bottom: 1px solid #e5e5e5; }
 .faq-question { width: 100%; padding: 20px 0; display: flex; justify-content: space-between; align-items: center; background: none; border: none; cursor: pointer; font-size: 0.9rem; font-weight: 500; text-align: left; }
 .faq-question i { transition: transform 0.3s ease; }
@@ -102,12 +97,10 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
 .faq-item.open .faq-answer { max-height: 200px; }
 .faq-answer p { padding-bottom: 20px; font-size: 0.85rem; color: #888; line-height: 1.6; }
-
 .site-footer { background: #0a0a0a; color: #fff; padding: 60px 0 30px; }
 .site-footer a { color: #888; text-decoration: none; font-size: 0.75rem; transition: color 0.3s ease; }
 .site-footer a:hover { color: #FFD700; }
 .site-footer h4 { font-family: 'Oswald', sans-serif; font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1.5rem; font-weight: 600; color: #FFD700; }
-
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
 .modal-overlay.active { display: flex; }
 .modal-content { background: #fff; max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; }
@@ -122,7 +115,6 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .quick-view-info .notes { font-size: 0.75rem; color: #888; margin-bottom: 2rem; }
 .add-to-cart-btn { width: 100%; padding: 16px; background: #0a0a0a; color: #fff; border: none; font-family: 'Oswald', sans-serif; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: background 0.3s ease; }
 .add-to-cart-btn:hover { background: #333; }
-
 .cart-drawer { position: fixed; top: 0; right: 0; width: 100%; max-width: 420px; height: 100vh; background: #fff; z-index: 100; transform: translateX(100%); transition: transform 0.4s ease; display: flex; flex-direction: column; }
 .cart-drawer.open { transform: translateX(0); }
 .cart-drawer-header { padding: 24px; border-bottom: 1px solid #e5e5e5; display: flex; justify-content: space-between; align-items: center; background: #0a0a0a; }
@@ -144,21 +136,17 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .checkout-btn { width: 100%; padding: 16px; background: #0a0a0a; color: #fff; border: none; font-family: 'Oswald', sans-serif; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; margin-bottom: 10px; transition: background 0.3s ease; }
 .checkout-btn:hover { background: #333; }
 .checkout-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
 .checkout-form input, .checkout-form textarea, .checkout-form select { width: 100%; padding: 14px 16px; border: 1px solid #e5e5e5; font-size: 0.85rem; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.3s ease; margin-bottom: 12px; }
 .checkout-form input:focus, .checkout-form textarea:focus, .checkout-form select:focus { border-color: #0a0a0a; }
 .checkout-form label { display: block; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; color: #888; font-family: 'Oswald', sans-serif; font-weight: 600; }
-
 .currency-toggle { display: inline-flex; align-items: center; gap: 4px; background: none; border: 1px solid currentColor; color: inherit; font-family: 'Oswald', sans-serif; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; cursor: pointer; transition: all 0.3s ease; border-radius: 2px; }
 .currency-toggle:hover { background: rgba(0,0,0,0.05); }
 .main-nav.scrolled .currency-toggle { color: #0a0a0a; border-color: #0a0a0a; }
 .main-nav.scrolled .currency-toggle:hover { background: rgba(0,0,0,0.05); }
-
 .toast-msg { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #0a0a0a; color: #fff; padding: 14px 32px; font-family: 'Oswald', sans-serif; font-size: 0.85rem; font-weight: 600; z-index: 10000; opacity: 0; transition: all 0.4s ease; white-space: nowrap; letter-spacing: 0.05em; }
 .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .currency-detect-loader { position: fixed; top: 80px; right: 20px; z-index: 60; background: #0a0a0a; color: #fff; padding: 8px 16px; font-family: 'Oswald', sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 2px; opacity: 0; transform: translateY(-10px); transition: all 0.4s ease; pointer-events: none; }
 .currency-detect-loader.show { opacity: 1; transform: translateY(0); }
-
 @media (min-width: 768px) { .md\:hidden { display: none !important; } }
 @media (max-width: 1024px) { .product-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 768px) {
@@ -166,7 +154,6 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .nav-links { display: none; } .mobile-menu-btn { display: block; } .hero-carousel { height: 70vh; min-height: 400px; }
 }
 @media (max-width: 480px) { .product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
-
 .whatsapp-float { position: fixed; bottom: 30px; right: 30px; z-index: 90; width: 56px; height: 56px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(37, 211, 102, 0.4); cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
 .whatsapp-float:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(37, 211, 102, 0.5); }
 .whatsapp-float i { color: #fff; font-size: 1.6rem; }
@@ -174,7 +161,6 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .whatsapp-tooltip::after { content: ''; position: absolute; top: 50%; right: -6px; transform: translateY(-50%); border-width: 6px 0 6px 6px; border-style: solid; border-color: transparent transparent transparent #0a0a0a; }
 .whatsapp-float:hover + .whatsapp-tooltip, .whatsapp-tooltip:hover { opacity: 1; transform: translateX(0); }
 @media (max-width: 768px) { .whatsapp-float { width: 48px; height: 48px; bottom: 20px; right: 20px; } .whatsapp-float i { font-size: 1.4rem; } .whatsapp-tooltip { display: none; } }
-
 .success-section { display: none; min-height: 100vh; background: #0a0a0a; color: #fff; padding: 40px 20px; }
 .success-section.active { display: flex; align-items: center; justify-content: center; }
 .success-card { background: #111; border-radius: 12px; max-width: 600px; width: 100%; padding: 48px 40px; text-align: center; }
@@ -199,14 +185,12 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 .email-note { margin-top: 24px; padding-top: 20px; border-top: 1px solid #222; font-size: 0.8rem; color: #666; line-height: 1.6; }
 .email-note i { color: #FFD700; margin-right: 6px; }
 @media (max-width: 480px) { .success-card { padding: 32px 20px; } .success-card h1 { font-size: 1.5rem; } }
-
 .mm-step-badge { width: 36px; height: 36px; border-radius: 50%; background: #0a0a0a; color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Oswald', sans-serif; font-size: 1rem; font-weight: 700; }
 .mm-step-title { font-family: 'Oswald', sans-serif; font-size: 1.3rem; font-weight: 700; color: #0a0a0a; text-transform: uppercase; letter-spacing: 0.05em; }
 </style>
 <base target="_blank">
 </head>
 <body>
-
 <div class="currency-detect-loader" id="currencyLoader">
 <i class="fas fa-globe" style="margin-right:6px;"></i>
 <span id="currencyLoaderText">Detecting your location...</span>
@@ -283,7 +267,6 @@ body { background: #ffffff; color: #0a0a0a; font-family: 'Inter', sans-serif; ov
 <a href="#shop" class="hero-btn" onclick="event.preventDefault(); document.getElementById('shop').scrollIntoView({behavior: 'smooth'});">Shop Now</a>
 </div>
 </div>
-
 <div class="carousel-dots">
 <div class="carousel-dot active" onclick="goToSlide(0)"></div>
 <div class="carousel-dot" onclick="goToSlide(1)"></div>
@@ -519,7 +502,6 @@ Pick any two items and create your own bundle. Mix a candle with a diffuser, or 
 </div>
 <div><label>Postal Code</label><input type="text" id="coPostal" required></div>
 </div>
-
 <div style="margin:20px 0; text-align:center;">
 <div style="background:#f8f9ff; border:1px solid #e0e4ff; padding:16px; border-radius:8px; margin-bottom:16px;">
 <svg xmlns="http://www.w3.org/2000/svg" width="76.57" height="32" viewBox="0 0 512 214" style="margin-bottom:8px;">
@@ -540,13 +522,10 @@ Pick any two items and create your own bundle. Mix a candle with a diffuser, or 
 
 <script>
 console.log("BX CLUB Script Initialized");
-
 function safeGet(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
 function safeSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
 function safeRemove(key) { try { localStorage.removeItem(key); } catch(e) {} }
-
 const ADMIN_EMAIL = 'bxclubhq@gmail.com';
-
 const countryCurrencyMap = { 'NG': 'NGN', 'GB': 'GBP', 'US': 'USD', 'EU': 'EUR', 'CA': 'CAD', 'AU': 'AUD', 'ZA': 'ZAR', 'GH': 'GHS', 'KE': 'KES', 'IN': 'INR', 'JP': 'JPY', 'CN': 'CNY', 'FR': 'EUR', 'DE': 'EUR', 'IT': 'EUR', 'ES': 'EUR' };
 const currencySymbols = { 'NGN': '₦', 'GBP': '£', 'USD': '$', 'EUR': '€', 'ZAR': 'R', 'GHS': '', 'KES': 'KSh', 'INR': '', 'JPY': '¥', 'CNY': '¥', 'CAD': 'C$', 'AUD': 'A$' };
 const FALLBACK_CURRENCY = 'USD';
@@ -555,13 +534,15 @@ const products = [
 { id: 1, name: "BX CLUB Candle — Summer in London", shortName: "Candle — Summer in London", collection: "summer", type: "candle", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781517668/05a944f8-5de4-4e7f-bc2c-2d58086e4c71_iwpcme.png", description: "A fruity gourmand fragrance inspired by summer in London.", notes: ["Black Cherry", "Raspberry", "Vanilla"] },
 { id: 2, name: "BX CLUB Candle — Midnight in Lagos", shortName: "Candle — Midnight in Lagos", collection: "midnight", type: "candle", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781571548/bcaaea51-cf78-4962-9929-afb4665ea903_mwftya.png", description: "A woody leather candle inspired by Lagos nights.", notes: ["Plum", "Leather", "Sandalwood"] },
 { id: 3, name: "BX CLUB Diffuser — Summer in London", shortName: "Diffuser — Summer in London", collection: "summer", type: "diffuser", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781519410/e64c5794-56a4-4a2d-a66a-3a3e57d8d34a_lltpuq.png", description: "A fruity gourmand diffuser inspired by summer in London.", notes: ["Black Cherry", "Raspberry", "Vanilla"] },
-{ id: 4, name: "BX CLUB Diffuser — Midnight in Lagos", shortName: "Diffuser — Midnight in Lagos", collection: "midnight", type: "diffuser", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781519609/6dcc16c1-d477-4b03-9868-792ff0fa46c4_hmqnab.png", description: "A woody leather diffuser inspired by Lagos nights.", notes: ["Plum", "Leather", "Sandalwood"] },
+{ id: 4, name: "BX CLUB Diffuser — Midnight in Lagos", shortName: "Diffuser — Midnight in Lagos", collection: "midnight", type: "diffuser", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781519609/6dcc16c1-d477-4b03-9868-792ff0fa46c4_hmqnab.png", description: "A woody leather diffuser inspired by Lagos nights.", notes: ["Plum", "Leather", "Sandalwood"] }
 ];
+
 const singleProducts = [
 { id: 101, name: "BX CLUB — Summer in London Collection", shortName: "Summer in London Set", collection: "summer", type: "set", priceNGN: 135000, priceGBP: 75, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1784329241/ChatGPT_Image_Jul_17_2026_04_00_18_PM_ajutoz.png", description: "The complete Summer in London collection.", notes: ["Candle", "Diffuser", "Instruments"] },
 { id: 102, name: "BX CLUB — Midnight in Lagos Collection", shortName: "Midnight in Lagos Set", collection: "midnight", type: "set", priceNGN: 135000, priceGBP: 75, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1784328986/ChatGPT_Image_Jul_17_2026_03_42_18_PM_gggxg8.png", description: "The complete Midnight in Lagos collection.", notes: ["Candle", "Diffuser", "Instruments"] },
 { id: 105, name: "BX CLUB Instruments of Flame", shortName: "Instruments of Flame", collection: "accessories", type: "accessories", priceNGN: 36000, priceGBP: 20, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781519239/53ccd5ce-71e8-4b6f-ba12-646bfb8949f4_em3liv.png", description: "Essential tools for the discerning luminary owner.", notes: ["Trimmer", "Dipper", "Snuffer", "Tray"] }
 ];
+
 const faqs = [
 { q: "How long do your candles burn?", a: "Our candles burn for 55-80 hours." },
 { q: "Do you ship internationally?", a: "Yes, we ship worldwide." },
@@ -635,7 +616,6 @@ document.getElementById('shopGrid').innerHTML = filtered.map(renderProductCard).
 document.getElementById('shop').scrollIntoView({ behavior: 'smooth' });
 showToast('Showing ' + (collection === 'summer' ? 'Summer in London' : 'Midnight in Lagos'));
 }
-
 function getProductPrice(product) {
     if (currentCurrency === 'GBP') return { price: product.priceGBP, symbol: '£' };
     if (currentCurrency === 'NGN') return { price: product.priceNGN, symbol: '₦' };
@@ -643,7 +623,6 @@ function getProductPrice(product) {
     if (rate) return { price: Math.round(product.priceGBP * rate), symbol: currencySymbols[currentCurrency] || currentCurrency };
     return { price: product.priceGBP, symbol: '£' };
 }
-
 function getCartItemPrice(item) {
     if (item.isBundle) {
         if (currentCurrency === 'NGN') return { price: item.priceNGN, symbol: '₦' };
@@ -656,7 +635,6 @@ function getCartItemPrice(item) {
     if (rate) return { price: Math.round(item.priceGBP * rate), symbol: currencySymbols[currentCurrency] || currentCurrency };
     return { price: item.priceGBP, symbol: '£' };
 }
-
 async function detectCurrencyFromIP() {
 const loader = document.getElementById('currencyLoader'); const loaderText = document.getElementById('currencyLoaderText');
 if (isCurrencyManuallyChanged) return;
@@ -679,11 +657,13 @@ setTimeout(() => { loader.classList.remove('show'); showToast('Welcome from ' + 
 } catch (error) { console.error('Currency detection failed:', error); loader.classList.remove('show'); } 
 finally { updateCurrencyButtons(); renderProducts(); updateCartUI(); renderMixMatchGrid1(); renderMixMatchGrid2(); if (mmSelected1 && mmSelected2) showBundleSummary(); }
 }
-
 function getCartSubtotal() { return cart.reduce((sum, item) => sum + (getCartItemPrice(item).price * item.quantity), 0); }
 function convertFromGBP(amount) { if (currentCurrency === 'GBP') return { price: amount, symbol: '£' }; if (currentCurrency === 'NGN') return { price: Math.round(amount * (exchangeRates['NGN'] || 1800)), symbol: '₦' }; return { price: amount, symbol: '£' }; }
 function convertFromNGN(amount) { if (currentCurrency === 'NGN') return { price: amount, symbol: '' }; const ngnRate = exchangeRates['NGN'] || 1800; const gbpAmount = amount / ngnRate; if (currentCurrency === 'GBP') return { price: Math.round(gbpAmount * 100) / 100, symbol: '£' }; return { price: Math.round(gbpAmount * 100) / 100, symbol: '£' }; }
-function getShippingCost(country) { if (country === 'uk') return convertFromGBP(SHIPPING_UK_GBP); return convertFromNGN(SHIPPING_NIGERIA_NGN); }
+function getShippingCost(country) { 
+    if (country === 'uk') return convertFromGBP(SHIPPING_UK_GBP); 
+    return convertFromNGN(SHIPPING_NIGERIA_NGN); 
+}
 
 function openQuickView(productId) {
 const product = [...products, ...singleProducts].find(p => p.id === productId); if(!product) return;
@@ -696,7 +676,6 @@ document.getElementById('qvQty').textContent = qvQty; document.getElementById('q
 function closeQuickView(e) { if(e && e.target !== e.currentTarget && e.type === 'click') return; document.getElementById('quickViewModal').classList.remove('active'); document.body.style.overflow = ''; }
 function updateQVQty(delta) { qvQty = Math.max(1, qvQty + delta); document.getElementById('qvQty').textContent = qvQty; }
 function addFromQuickView() { if(!currentQVProduct) return; addToCart(currentQVProduct.id, qvQty); closeQuickView(); }
-
 function addToCart(productId, qty) {
 const product = [...products, ...singleProducts].find(p => p.id === productId); if(!product) return;
 const existing = cart.find(item => item.id === productId);
@@ -707,7 +686,6 @@ saveCart(); updateCartUI(); showToast(product.shortName + ' added to cart');
 function removeFromCart(productId) { cart = cart.filter(item => item.id !== productId); saveCart(); updateCartUI(); }
 function updateCartQty(productId, delta) { const item = cart.find(i => i.id === productId); if(item) { item.quantity += delta; if(item.quantity <= 0) removeFromCart(productId); else { saveCart(); updateCartUI(); } } }
 function saveCart() { safeSet('bxclub_cart', JSON.stringify(cart)); }
-
 function updateCartUI() {
 const count = cart.reduce((sum, item) => sum + item.quantity, 0);
 ['cartBadge', 'cartBadgeMobile'].forEach(id => { const badge = document.getElementById(id); if(badge) { badge.textContent = count; badge.style.display = count > 0 ? 'flex' : 'none'; } });
@@ -727,7 +705,6 @@ document.getElementById('cartSubtotal').textContent = symbol + formatPrice(subto
 document.getElementById('cartTotal').textContent = symbol + formatPrice(subtotal);
 }
 function toggleCart() { document.getElementById('cartDrawer').classList.toggle('open'); document.getElementById('cartOverlay').style.display = document.getElementById('cartDrawer').classList.contains('open') ? 'block' : 'none'; document.body.style.overflow = document.getElementById('cartDrawer').classList.contains('open') ? 'hidden' : ''; }
-
 function openShippingInvoice() {
 if(cart.length === 0) { showToast('Your cart is empty'); return; }
 if(document.getElementById('cartDrawer').classList.contains('open')) toggleCart();
@@ -743,8 +720,13 @@ document.getElementById('invoiceSubtotal').textContent = symbol + formatPrice(ge
 updateInvoiceShipping(); document.getElementById('shippingInvoiceModal').classList.add('active'); document.body.style.overflow = 'hidden';
 }
 function closeShippingInvoice(e) { if(e && e.target !== e.currentTarget && e.type === 'click') return; document.getElementById('shippingInvoiceModal').classList.remove('active'); document.body.style.overflow = ''; }
-function updateInvoiceShipping() { const country = document.getElementById('invoiceCountry').value; const ship = getShippingCost(country); const symbol = currencySymbols[currentCurrency] || currentCurrency; document.getElementById('invoiceShipping').textContent = ship.symbol + formatPrice(ship.price); document.getElementById('invoiceTotal').textContent = symbol + formatPrice(getCartSubtotal() + ship.price); }
-
+function updateInvoiceShipping() { 
+    const country = document.getElementById('invoiceCountry').value; 
+    const ship = getShippingCost(country); 
+    const symbol = currencySymbols[currentCurrency] || currentCurrency; 
+    document.getElementById('invoiceShipping').textContent = ship.symbol + formatPrice(ship.price); 
+    document.getElementById('invoiceTotal').textContent = symbol + formatPrice(getCartSubtotal() + ship.price); 
+}
 function proceedToPayment() { 
 closeShippingInvoice(); 
 document.getElementById('coCountry').value = document.getElementById('invoiceCountry').value; 
@@ -755,7 +737,6 @@ document.body.style.overflow = 'hidden';
 function closePayment(e) { if(e && e.target !== e.currentTarget && e.type === 'click') return; document.getElementById('paymentModal').classList.remove('active'); document.body.style.overflow = ''; }
 function backToInvoice() { closePayment(); document.getElementById('shippingInvoiceModal').classList.add('active'); document.body.style.overflow = 'hidden'; updateInvoiceShipping(); }
 function setCurrencyByCountry(country) { const map = { 'nigeria': 'NGN', 'uk': 'GBP' }; const cur = map[country]; if(!cur || cur === currentCurrency) return; currentCurrency = cur; isCurrencyManuallyChanged = true; safeSet('bxclub_manual_currency', 'true'); safeSet('bxclub_currency', currentCurrency); updateCurrencyButtons(); renderProducts(); updateCartUI(); }
-
 function updatePaymentSummary() {
 if(cart.length === 0) return;
 const country = document.getElementById('coCountry').value; const symbol = currencySymbols[currentCurrency] || currentCurrency;
@@ -764,13 +745,14 @@ const info = getCartItemPrice(item);
 if (item.isBundle && item.bundleItems) return '<div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.8rem;"><span>' + item.name + '</span><span style="color:#0a0a0a;font-family:\'Oswald\',sans-serif;font-weight:600;">' + info.symbol + formatPrice(info.price * item.quantity) + '</span></div>';
 return '<div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.8rem;"><span>' + item.shortName + ' × ' + item.quantity + '</span><span style="color:#0a0a0a;font-family:\'Oswald\',sans-serif;font-weight:600;">' + info.symbol + formatPrice(info.price * item.quantity) + '</span></div>';
 }).join('');
-const subtotal = getCartSubtotal(); const ship = getShippingCost(country);
+const subtotal = getCartSubtotal(); 
+const ship = getShippingCost(country);
 document.getElementById('paymentSubtotal').textContent = symbol + formatPrice(subtotal);
 document.getElementById('paymentShipping').textContent = ship.symbol + formatPrice(ship.price);
 document.getElementById('paymentTotalAmount').textContent = symbol + formatPrice(subtotal + ship.price);
 }
 
-// ==================== VERCEL STRIPE CHECKOUT ====================
+// ==================== CLEAN, DIRECT CHECKOUT ====================
 async function placeOrder(e) {
     e.preventDefault();
     if(cart.length === 0) { showToast('Your cart is empty'); return; }
@@ -796,39 +778,30 @@ async function placeOrder(e) {
     const txRef = 'BX-' + Date.now() + '-' + Math.floor(Math.random() * 1000000);
     const submitBtn = document.getElementById('submitOrderBtn');
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Redirecting to Stripe...';
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Processing...';
 
+    // 1. Save to local storage for Admin Dashboard fallback
+    const orderDetails = {
+        txRef: txRef, items: cart,
+        customer: { firstName, lastName, email, phone, address, city, country, postal },
+        currency: currentCurrency, amount: totalAmount, subtotal, shippingCost: shipping,
+        paymentMethod: 'stripe', status: 'pending', timestamp: new Date().toISOString()
+    };
     try {
-        const orderDetails = {
-            txRef: txRef, items: cart,
-            customer: { firstName, lastName, email, phone, address, city, country, postal },
-            currency: currentCurrency, amount: totalAmount, subtotal, shippingCost: shipping,
-            paymentMethod: 'stripe', status: 'pending', timestamp: new Date().toISOString()
-        };
-        
         const orders = JSON.parse(safeGet('bxclub_orders') || '[]');
         orders.push(orderDetails);
         safeSet('bxclub_orders', JSON.stringify(orders));
         window.dispatchEvent(new StorageEvent('storage', { key: 'bxclub_orders', newValue: JSON.stringify(orders) }));
+    } catch (e) { console.error('Local storage save failed', e); }
 
+    // 2. Call API and redirect directly
+    try {
         const response = await fetch('/api/checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                items: cart.map(item => {
-                    const priceInfo = getCartItemPrice(item);
-                    return { ...item, price: priceInfo.price };
-                }),
-                customer: { 
-                    firstName, 
-                    lastName, 
-                    email, 
-                    phone, 
-                    address, 
-                    city, 
-                    country, 
-                    postal 
-                },
+                items: cart.map(item => ({ ...item, price: getCartItemPrice(item).price })),
+                customer: { firstName, lastName, email, phone, address, city, country, postal },
                 amount: totalAmount,
                 currency: currentCurrency,
                 txRef: txRef
@@ -836,14 +809,11 @@ async function placeOrder(e) {
         });
 
         const data = await response.json();
-
         if (data.url) {
-            showToast('Redirecting to secure payment...');
             window.location.href = data.url;
         } else {
             throw new Error(data.error || 'Failed to create checkout session');
         }
-
     } catch (error) {
         console.error('Checkout Error:', error);
         showToast('Payment failed: ' + error.message);
@@ -860,10 +830,8 @@ function formatPrice(price, currency) { const num = Number(price) || 0; const fo
 function showToast(message) { const toast = document.getElementById('toast'); toast.textContent = message; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
 function toggleMobileMenu() { document.getElementById('mobileNav').classList.toggle('open'); }
 function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
-
 let lastScrollY = 0;
 window.addEventListener('scroll', () => { const nav = document.getElementById('mainNav'); const currentScrollY = window.scrollY; if (currentScrollY < 100) { nav.classList.remove('hidden'); nav.classList.remove('scrolled'); } else if (currentScrollY > lastScrollY) { nav.classList.add('hidden'); nav.classList.add('scrolled'); } else { nav.classList.remove('hidden'); nav.classList.add('scrolled'); } lastScrollY = currentScrollY; });
-
 document.addEventListener('DOMContentLoaded', () => {
 if (checkSuccessPage()) return;
 updateCurrencyButtons(); renderProducts(); renderFAQs(); updateCartUI(); startCarousel(); renderMixMatchGrid1(); detectCurrencyFromIP();
@@ -899,7 +867,6 @@ const bundleProduct = { id: 999000 + Date.now(), name: 'Mix & Match Bundle', sho
 cart.push(bundleProduct); saveCart(); updateCartUI(); showToast('Bundle added! You saved ' + symbol + formatPrice(bundleDiscount)); resetMixMatch(); setTimeout(() => toggleCart(), 500);
 }
 function resetMixMatch() { mmSelected1 = null; mmSelected2 = null; document.getElementById('mmStep2').style.display = 'none'; document.getElementById('mmStep3').style.display = 'none'; renderMixMatchGrid1(); }
-
 function checkSuccessPage() { const params = new URLSearchParams(window.location.search); if (params.get('success') === 'true') { document.getElementById('hero').style.display = 'none'; document.getElementById('shop').style.display = 'none'; document.getElementById('mixmatch').style.display = 'none'; document.getElementById('collections').style.display = 'none'; ['about', 'faqs', 'contact'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; }); const footer = document.querySelector('.site-footer'); if (footer) footer.style.display = 'none'; document.getElementById('mainNav').style.display = 'none'; document.getElementById('successSection').classList.add('active'); renderSuccessOrder(); return true; } return false; }
 function renderSuccessOrder() {
 const params = new URLSearchParams(window.location.search); const txRef = params.get('order');
@@ -913,44 +880,18 @@ const shippingCost = order.shippingCost || 0; const subtotal = order.subtotal ||
 orderDetailsEl.innerHTML = '<div class="order-row"><span>Order Reference</span><span>#' + order.txRef + '</span></div><div class="order-row"><span>Date</span><span>' + new Date(order.timestamp).toLocaleString() + '</span></div><div class="order-row"><span>Status</span><span style="color:#4ade80;"><i class="fas fa-check-circle" style="margin-right:4px;"></i>Paid via Stripe</span></div><div style="margin-top:20px;border-top:1px solid #333;padding-top:16px;"><h4 style="font-family:\'Oswald\',sans-serif;font-size:0.8rem;letter-spacing:0.15em;text-transform:uppercase;color:#FFD700;margin-bottom:12px;font-weight:600;">Items</h4><div class="item-list">' + itemsHtml + '</div></div><div class="order-row" style="margin-top:8px;"><span>Subtotal</span><span>' + formatPrice(subtotal, orderCurrency) + '</span></div><div class="order-row"><span>Shipping</span><span>' + formatPrice(shippingCost, orderCurrency) + '</span></div><div class="order-row total"><span>Grand Total</span><span>' + formatPrice(order.amount, orderCurrency) + '</span></div>';
 if (order.customer) { shippingBox.style.display = 'block'; shippingDetails.innerHTML = '<div class="order-row"><span>Name</span><span>' + order.customer.firstName + ' ' + order.customer.lastName + '</span></div><div class="order-row"><span>Email</span><span>' + order.customer.email + '</span></div><div class="order-row"><span>Phone</span><span>' + order.customer.phone + '</span></div><div class="order-row"><span>Address</span><span style="text-align:right;">' + order.customer.address + '<br>' + order.customer.city + '<br>' + (order.customer.country === 'uk' ? 'United Kingdom' : 'Nigeria') + '<br>' + order.customer.postal + '</span></div>'; }
 }
-
 if (document.readyState === 'complete' || document.readyState === 'interactive') { renderProducts(); renderFAQs(); updateCartUI(); renderMixMatchGrid1(); }
 </script>
-
-<!-- Enhanced Site Visit Tracking with Location -->
 <script>
-async function trackVisit() {
-    let locationData = { country: 'Unknown', city: 'Unknown' };
-    
-    // 1. Try to get location from IP
-    try {
-        const res = await fetch('https://ipapi.co/json/');
-        if (res.ok) {
-            const data = await res.json();
-            locationData.country = data.country_name || 'Unknown';
-            locationData.city = data.city || 'Unknown';
-        }
-    } catch (e) {
-        console.log('Location fetch failed', e);
-    }
-
-    // 2. Send data to backend
-    fetch('/api/track', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            page: window.location.pathname,
-            referrer: document.referrer || 'direct',
-            userAgent: navigator.userAgent,
-            timestamp: new Date().toISOString(), // Force fresh, valid timestamp
-            country: locationData.country,
-            city: locationData.city
-        })
-    }).catch(e => console.log('Track error:', e));
-}
-
-// Run tracking immediately
-trackVisit();
+fetch('/api/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        page: window.location.pathname,
+        referrer: document.referrer || 'direct',
+        userAgent: navigator.userAgent
+    })
+}).catch(e => console.log('Track error:', e));
 </script>
 <a href="https://wa.me/447538277711" target="_blank" class="whatsapp-float" aria-label="Chat on WhatsApp"><i class="fab fa-whatsapp"></i></a>
 <div class="whatsapp-tooltip">Chat with us on WhatsApp</div>
@@ -971,4 +912,3 @@ trackVisit();
 </div>
 </body>
 </html>
- check index.html also
