@@ -1,10 +1,9 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { Resend } = require('resend');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-let resend = null;
-if (process.env.RESEND_API_KEY) {
-  resend = new Resend(process.env.RESEND_API_KEY);
-}
+// CRITICAL: Stripe requires the raw body to verify the signature.
+export const config = { api: { bodyParser: false } };
 
 async function buffer(readable) {
   const chunks = [];
@@ -14,8 +13,10 @@ async function buffer(readable) {
   return Buffer.concat(chunks);
 }
 
-async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
   try {
     const buf = await buffer(req);
@@ -23,8 +24,8 @@ async function handler(req, res) {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
     if (!webhookSecret) {
-      console.error('❌ CRITICAL: STRIPE_WEBHOOK_SECRET is missing!');
-      return res.status(200).json({ received: true });
+      console.error('❌ CRITICAL: STRIPE_WEBHOOK_SECRET is missing in Vercel!');
+      return res.status(200).json({ received: true }); // Return 200 to stop Stripe retries
     }
 
     let event;
@@ -46,63 +47,68 @@ async function handler(req, res) {
 
       if (url && token && txRef) {
         try {
-          const fetchRes = await fetch(`${url}/lrange/bx_orders/0/-1`, { headers: { Authorization: `Bearer ${token}` } });
-          if (!fetchRes.ok) throw new Error(`Failed to fetch: ${fetchRes.status}`);
-          
+          // 1. Fetch all orders
+          const fetchRes = await fetch(`${url}/lrange/bx_orders/0/-1`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
           const data = await fetchRes.json();
           let orders = (data.result || []).map(o => {
             try { return JSON.parse(o); } catch (e) { return null; }
           }).filter(Boolean);
 
+          // 2. Find and update the specific order
           const orderIndex = orders.findIndex(o => o.txRef === txRef);
           if (orderIndex !== -1) {
             console.log('✅ Found order. Updating status to PAID.');
             orders[orderIndex].status = 'paid';
             orders[orderIndex].verifiedAt = new Date().toISOString();
             
+            // 3. Save back to database
             await fetch(`${url}/del/bx_orders`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
-            
-            const stringifiedOrders = orders.reverse().map(o => JSON.stringify(o));
-            const pushRes = await fetch(`${url}/lpush/bx_orders`, {
+            await fetch(`${url}/lpush/bx_orders`, {
               method: 'POST',
               headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-              body: JSON.stringify(stringifiedOrders)
+              body: JSON.stringify(orders.map(o => JSON.stringify(o)))
             });
-            
-            if (!pushRes.ok) throw new Error(`Failed to push: ${pushRes.status}`);
-            console.log('✅ Orders successfully updated in Upstash');
+          } else {
+            console.warn('⚠️ Order txRef not found in database:', txRef);
           }
         } catch (dbError) {
-          console.error('❌ Database update failed:', dbError.message);
+          console.error('❌ Database update failed:', dbError);
         }
       }
 
-      if (resend && session.customer_email) {
-        try {
-          const customerName = session.metadata?.customerName || 'Customer';
-          const currencySymbol = session.currency === 'gbp' ? '£' : '₦';
-          const amountFormatted = ((session.amount_total || 0) / 100).toLocaleString();
-          
-          await resend.emails.send({
-            from: 'BX CLUB <orders@mg.bxclubhq.com>',
-            to: [session.customer_email], 
-            subject: `✅ Order Confirmed — #${txRef}`,
-            html: `<h1 style="color:#FFD700">Thank You!</h1><p>Order #${txRef} confirmed.</p><p>Total: ${currencySymbol}${amountFormatted}</p>`,
-          });
-          console.log('📧 Receipt email sent');
-        } catch (emailError) {
-          console.error('❌ Email failed:', emailError.message);
-        }
+      // 4. Send Customer Receipt Email
+      try {
+        const customerName = session.metadata?.customerName || 'Customer';
+        const currencySymbol = session.currency === 'gbp' ? '£' : '₦';
+        
+        await resend.emails.send({
+          from: 'BX CLUB <orders@mg.bxclubhq.com>', // ✅ Uses your newly verified domain!
+          to: [session.customer_email], // ✅ Sends directly to the customer
+          subject: `✅ Order Confirmed — #${txRef}`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #fff; padding: 30px; border-radius: 8px; text-align: center;">
+              <h1 style="color: #FFD700;">Thank You, ${customerName.split(' ')[0]}!</h1>
+              <p style="color: #888;">Your order #${txRef} has been received and is being prepared.</p>
+              <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; margin-top: 20px;">
+                <p style="color: #FFD700; font-size: 24px; font-weight: bold; margin: 0;">${currencySymbol}${(session.amount_total / 100).toLocaleString()}</p>
+              </div>
+              <p style="color: #666; font-size: 12px; margin-top: 30px;">BX CLUB | Blackxcellencee</p>
+            </div>
+          `,
+        });
+        console.log('📧 Receipt email sent successfully to:', session.customer_email);
+      } catch (emailError) {
+        console.error('❌ Email failed:', emailError);
       }
     }
 
-    return res.status(200).json({ received: true });
+    // ALWAYS return 200 to Stripe so they stop retrying
+    res.status(200).json({ received: true });
 
   } catch (error) {
-    console.error('❌ Webhook handler crashed:', error.message);
-    return res.status(200).json({ received: true }); // Always return 200 to Stripe
+    console.error('❌ Webhook handler crashed:', error);
+    res.status(200).json({ received: true }); // Still return 200 to stop Stripe emails
   }
 }
-
-handler.config = { api: { bodyParser: false } };
-module.exports = handler;
