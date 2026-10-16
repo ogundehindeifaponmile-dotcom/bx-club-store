@@ -556,8 +556,7 @@ const products = [
 { id: 2, name: "BX CLUB Candle — Midnight in Lagos", shortName: "Candle — Midnight in Lagos", collection: "midnight", type: "candle", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781571548/bcaaea51-cf78-4962-9929-afb4665ea903_mwftya.png", description: "A woody leather candle inspired by Lagos nights.", notes: ["Plum", "Leather", "Sandalwood"] },
 { id: 3, name: "BX CLUB Diffuser — Summer in London", shortName: "Diffuser — Summer in London", collection: "summer", type: "diffuser", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781519410/e64c5794-56a4-4a2d-a66a-3a3e57d8d34a_lltpuq.png", description: "A fruity gourmand diffuser inspired by summer in London.", notes: ["Black Cherry", "Raspberry", "Vanilla"] },
 { id: 4, name: "BX CLUB Diffuser — Midnight in Lagos", shortName: "Diffuser — Midnight in Lagos", collection: "midnight", type: "diffuser", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781519609/6dcc16c1-d477-4b03-9868-792ff0fa46c4_hmqnab.png", description: "A woody leather diffuser inspired by Lagos nights.", notes: ["Plum", "Leather", "Sandalwood"] },
-{ id: 999, name: "TEST 102 — Test Product", shortName: "TEST 102", collection: "test", type: "candle", priceNGN: 1000, priceGBP: 0.55, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781517668/05a944f8-5de4-4e7f-bc2c-2d58086e4c71_iwpcme.png", description: "Test product for checkout and email workflow (No shipping fee).", notes: ["Test", "Item"] }
-];
+
 const singleProducts = [
 { id: 101, name: "BX CLUB — Summer in London Collection", shortName: "Summer in London Set", collection: "summer", type: "set", priceNGN: 135000, priceGBP: 75, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1784329241/ChatGPT_Image_Jul_17_2026_04_00_18_PM_ajutoz.png", description: "The complete Summer in London collection.", notes: ["Candle", "Diffuser", "Instruments"] },
 { id: 102, name: "BX CLUB — Midnight in Lagos Collection", shortName: "Midnight in Lagos Set", collection: "midnight", type: "set", priceNGN: 135000, priceGBP: 75, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1784328986/ChatGPT_Image_Jul_17_2026_03_42_18_PM_gggxg8.png", description: "The complete Midnight in Lagos collection.", notes: ["Candle", "Diffuser", "Instruments"] },
@@ -789,9 +788,7 @@ document.getElementById('paymentShipping').textContent = ship.symbol + formatPri
 document.getElementById('paymentTotalAmount').textContent = symbol + formatPrice(subtotal + ship.price);
 }
 
-// ==================== BULLETPROOF 2-STEP CHECKOUT ====================
-let pendingOrderData = null;
-
+// ==================== STANDARD CHECKOUT ====================
 async function placeOrder(e) {
     e.preventDefault();
     if(cart.length === 0) { showToast('Your cart is empty'); return; }
@@ -816,14 +813,9 @@ async function placeOrder(e) {
     totalAmount = Math.round(totalAmount); 
 
     const txRef = 'BX-' + Date.now() + '-' + Math.floor(Math.random() * 1000000);
-    const sym = currentCurrency === 'GBP' ? '£' : '₦';
-    const countryName = country === 'uk' ? 'United Kingdom' : 'Nigeria';
-
-    // Save order details globally for the 2nd step
-    pendingOrderData = {
-        txRef, firstName, lastName, email, phone, address, city, country, postal,
-        totalAmount, sym, countryName, subtotal, shipping
-    };
+    const submitBtn = document.getElementById('submitOrderBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Processing...';
 
     // Save to local storage immediately for Admin Dashboard fallback
     const orderDetails = {
@@ -840,118 +832,32 @@ async function placeOrder(e) {
         window.dispatchEvent(new StorageEvent('storage', { key: 'bxclub_orders', newValue: JSON.stringify(orders) }));
     } catch (e) { console.error('Local storage save failed', e); }
 
-    // Show the custom 2-step instruction modal
-    showCheckoutModal();
-}
-
-function showCheckoutModal() {
-    const existing = document.getElementById('checkout-instruction-modal');
-    if (existing) existing.remove();
-
-    const overlay = document.createElement('div');
-    overlay.id = 'checkout-instruction-modal';
-    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(4px);';
-    
-    const box = document.createElement('div');
-    box.style.cssText = 'background:#111; border:2px solid #FFD700; border-radius:12px; padding:30px; max-width:500px; width:100%; text-align:center; color:#fff; font-family: Inter, sans-serif; box-shadow: 0 10px 40px rgba(0,0,0,0.5);';
-    
-    box.innerHTML = `
-        <div style="font-size:2.5rem; margin-bottom:15px;">⚠️</div>
-        <h2 style="color:#FFD700; margin:0 0 15px 0; font-family:Oswald, sans-serif; font-size:1.5rem; text-transform:uppercase;">Important Checkout Step</h2>
-        <p style="line-height:1.6; margin-bottom:25px; font-size:0.95rem; color:#ccc;">
-            Due to temporary recording updates, please ensure you <strong>send the order email first</strong>. <br><br>
-            Once sent, return to this page and click the button below to finalize your payment securely via Stripe.
-        </p>
-        
-        <button onclick="triggerEmailSend()" style="display:block; width:100%; padding:16px; background:#333; color:#fff; border:1px solid #555; font-weight:bold; border-radius:8px; margin-bottom:15px; font-size:1rem; cursor:pointer; transition:all 0.2s;">
-            📧 Step 1: Open & Send Order Email
-        </button>
-        
-        <button onclick="finalizeStripePayment()" style="display:block; width:100%; padding:16px; background:#635BFF; color:#fff; border:none; font-weight:bold; border-radius:8px; font-size:1.1rem; cursor:pointer; transition:all 0.2s; box-shadow: 0 4px 15px rgba(99, 91, 255, 0.4);">
-            💳 Step 2: Continue to Secure Payment
-        </button>
-        
-        <button onclick="document.getElementById('checkout-instruction-modal').remove()" style="background:none; border:none; color:#888; margin-top:20px; cursor:pointer; text-decoration:underline; font-size:0.85rem;">
-            Cancel and return to cart
-        </button>
-    `;
-    
-    overlay.appendChild(box);
-    document.body.appendChild(overlay);
-}
-
-function triggerEmailSend() {
-    if (!pendingOrderData) return;
-    const { txRef, firstName, lastName, email, phone, address, city, countryName, postal, totalAmount, sym, subtotal, shipping } = pendingOrderData;
-    
-    let itemsList = cart.map(item => `- ${item.shortName || item.name} (x${item.quantity})`).join('\n');
-    const mailSubject = `New Order: ${firstName} ${lastName} (${txRef})`;
-    const mailBody = `Hello BX CLUB,\n\nI am placing a new order.\n\n--- ORDER DETAILS ---\n${itemsList}\n\nSubtotal: ${sym}${subtotal.toLocaleString()}\nShipping: ${sym}${shipping.toLocaleString()}\nTOTAL TO PAY: ${sym}${totalAmount.toLocaleString()}\n\n--- DELIVERY DETAILS ---\nName: ${firstName} ${lastName}\nEmail: ${email}\nPhone: ${phone}\nAddress: ${address}\nCity: ${city}\nCountry: ${countryName}\nPostal Code: ${postal}\n\nOrder Reference: ${txRef}`;
-
-    window.location.href = `mailto:bxclubhq@gmail.com?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
-    
-    const btn = event.target;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '✅ Email App Opened!';
-    btn.style.background = '#1a472a';
-    btn.style.borderColor = '#4ade80';
-    btn.style.color = '#4ade80';
-    
-    setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.style.background = '#333';
-        btn.style.borderColor = '#555';
-        btn.style.color = '#fff';
-    }, 3000);
-}
-
-async function finalizeStripePayment() {
-    if (!pendingOrderData) return;
-    const btn = event.target;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-    btn.disabled = true;
-
     try {
         const response = await fetch('/api/checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 items: cart.map(item => ({ ...item, price: getCartItemPrice(item).price })),
-                customer: { 
-                    firstName: pendingOrderData.firstName, 
-                    lastName: pendingOrderData.lastName, 
-                    email: pendingOrderData.email, 
-                    phone: pendingOrderData.phone, 
-                    address: pendingOrderData.address, 
-                    city: pendingOrderData.city, 
-                    country: pendingOrderData.country, 
-                    postal: pendingOrderData.postal 
-                },
-                amount: pendingOrderData.totalAmount,
+                customer: { firstName, lastName, email, phone, address, city, country, postal },
+                amount: totalAmount,
                 currency: currentCurrency,
-                txRef: pendingOrderData.txRef
+                txRef: txRef
             })
         });
-        
-        // Check if the response is actually JSON before parsing
-        const contentType = response.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-            const text = await response.text();
-            throw new Error(`Server returned HTML instead of JSON (Status: ${response.status}). Check if api/checkout.js is in the correct folder.`);
-        }
 
         const data = await response.json();
-        
-        if (response.ok && data.url) {
+
+        if (data.url) {
             window.location.href = data.url;
         } else {
-            throw new Error(data.error || `Server returned status ${response.status}`);
+            throw new Error(data.error || 'Failed to create checkout session');
         }
+
     } catch (error) {
-        console.error('Checkout Error Details:', error);
-        alert('ERROR: ' + error.message + '\n\nPlease check the browser console (F12) and ensure api/checkout.js is inside the "api" folder in GitHub.');
-        btn.innerHTML = '💳 Step 2: Continue to Secure Payment';
-        btn.disabled = false;
+        console.error('Checkout Error:', error);
+        showToast('Payment failed: ' + error.message);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-lock" style="margin-right:8px;"></i>Continue to Payment';
     }
 }
 
