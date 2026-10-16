@@ -556,7 +556,7 @@ const products = [
 { id: 2, name: "BX CLUB Candle — Midnight in Lagos", shortName: "Candle — Midnight in Lagos", collection: "midnight", type: "candle", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781571548/bcaaea51-cf78-4962-9929-afb4665ea903_mwftya.png", description: "A woody leather candle inspired by Lagos nights.", notes: ["Plum", "Leather", "Sandalwood"] },
 { id: 3, name: "BX CLUB Diffuser — Summer in London", shortName: "Diffuser — Summer in London", collection: "summer", type: "diffuser", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781519410/e64c5794-56a4-4a2d-a66a-3a3e57d8d34a_lltpuq.png", description: "A fruity gourmand diffuser inspired by summer in London.", notes: ["Black Cherry", "Raspberry", "Vanilla"] },
 { id: 4, name: "BX CLUB Diffuser — Midnight in Lagos", shortName: "Diffuser — Midnight in Lagos", collection: "midnight", type: "diffuser", priceNGN: 54000, priceGBP: 30, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1781519609/6dcc16c1-d477-4b03-9868-792ff0fa46c4_hmqnab.png", description: "A woody leather diffuser inspired by Lagos nights.", notes: ["Plum", "Leather", "Sandalwood"] },
-
+];
 const singleProducts = [
 { id: 101, name: "BX CLUB — Summer in London Collection", shortName: "Summer in London Set", collection: "summer", type: "set", priceNGN: 135000, priceGBP: 75, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1784329241/ChatGPT_Image_Jul_17_2026_04_00_18_PM_ajutoz.png", description: "The complete Summer in London collection.", notes: ["Candle", "Diffuser", "Instruments"] },
 { id: 102, name: "BX CLUB — Midnight in Lagos Collection", shortName: "Midnight in Lagos Set", collection: "midnight", type: "set", priceNGN: 135000, priceGBP: 75, image: "https://res.cloudinary.com/dzosy1sic/image/upload/v1784328986/ChatGPT_Image_Jul_17_2026_03_42_18_PM_gggxg8.png", description: "The complete Midnight in Lagos collection.", notes: ["Candle", "Diffuser", "Instruments"] },
@@ -683,18 +683,7 @@ finally { updateCurrencyButtons(); renderProducts(); updateCartUI(); renderMixMa
 function getCartSubtotal() { return cart.reduce((sum, item) => sum + (getCartItemPrice(item).price * item.quantity), 0); }
 function convertFromGBP(amount) { if (currentCurrency === 'GBP') return { price: amount, symbol: '£' }; if (currentCurrency === 'NGN') return { price: Math.round(amount * (exchangeRates['NGN'] || 1800)), symbol: '₦' }; return { price: amount, symbol: '£' }; }
 function convertFromNGN(amount) { if (currentCurrency === 'NGN') return { price: amount, symbol: '' }; const ngnRate = exchangeRates['NGN'] || 1800; const gbpAmount = amount / ngnRate; if (currentCurrency === 'GBP') return { price: Math.round(gbpAmount * 100) / 100, symbol: '£' }; return { price: Math.round(gbpAmount * 100) / 100, symbol: '£' }; }
-function getShippingCost(country) { 
-    if (country === 'uk') return convertFromGBP(SHIPPING_UK_GBP); 
-    return convertFromNGN(SHIPPING_NIGERIA_NGN); 
-}
-
-function getEffectiveShipping(country) {
-    const isTestOrder = cart.some(item => item.id === 999);
-    if (isTestOrder) {
-        return currentCurrency === 'NGN' ? { price: 0, symbol: '₦' } : { price: 0, symbol: '£' };
-    }
-    return getShippingCost(country);
-}
+function getShippingCost(country) { if (country === 'uk') return convertFromGBP(SHIPPING_UK_GBP); return convertFromNGN(SHIPPING_NIGERIA_NGN); }
 
 function openQuickView(productId) {
 const product = [...products, ...singleProducts].find(p => p.id === productId); if(!product) return;
@@ -754,13 +743,7 @@ document.getElementById('invoiceSubtotal').textContent = symbol + formatPrice(ge
 updateInvoiceShipping(); document.getElementById('shippingInvoiceModal').classList.add('active'); document.body.style.overflow = 'hidden';
 }
 function closeShippingInvoice(e) { if(e && e.target !== e.currentTarget && e.type === 'click') return; document.getElementById('shippingInvoiceModal').classList.remove('active'); document.body.style.overflow = ''; }
-function updateInvoiceShipping() { 
-    const country = document.getElementById('invoiceCountry').value; 
-    const ship = getEffectiveShipping(country); 
-    const symbol = currencySymbols[currentCurrency] || currentCurrency; 
-    document.getElementById('invoiceShipping').textContent = ship.symbol + formatPrice(ship.price); 
-    document.getElementById('invoiceTotal').textContent = symbol + formatPrice(getCartSubtotal() + ship.price); 
-}
+function updateInvoiceShipping() { const country = document.getElementById('invoiceCountry').value; const ship = getShippingCost(country); const symbol = currencySymbols[currentCurrency] || currentCurrency; document.getElementById('invoiceShipping').textContent = ship.symbol + formatPrice(ship.price); document.getElementById('invoiceTotal').textContent = symbol + formatPrice(getCartSubtotal() + ship.price); }
 
 function proceedToPayment() { 
 closeShippingInvoice(); 
@@ -781,14 +764,13 @@ const info = getCartItemPrice(item);
 if (item.isBundle && item.bundleItems) return '<div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.8rem;"><span>' + item.name + '</span><span style="color:#0a0a0a;font-family:\'Oswald\',sans-serif;font-weight:600;">' + info.symbol + formatPrice(info.price * item.quantity) + '</span></div>';
 return '<div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.8rem;"><span>' + item.shortName + ' × ' + item.quantity + '</span><span style="color:#0a0a0a;font-family:\'Oswald\',sans-serif;font-weight:600;">' + info.symbol + formatPrice(info.price * item.quantity) + '</span></div>';
 }).join('');
-const subtotal = getCartSubtotal(); 
-const ship = getEffectiveShipping(country);
+const subtotal = getCartSubtotal(); const ship = getShippingCost(country);
 document.getElementById('paymentSubtotal').textContent = symbol + formatPrice(subtotal);
 document.getElementById('paymentShipping').textContent = ship.symbol + formatPrice(ship.price);
 document.getElementById('paymentTotalAmount').textContent = symbol + formatPrice(subtotal + ship.price);
 }
 
-// ==================== STANDARD CHECKOUT ====================
+// ==================== VERCEL STRIPE CHECKOUT ====================
 async function placeOrder(e) {
     e.preventDefault();
     if(cart.length === 0) { showToast('Your cart is empty'); return; }
@@ -807,38 +789,46 @@ async function placeOrder(e) {
     }
 
     const subtotal = getCartSubtotal();
-    const shippingInfo = getEffectiveShipping(country);
-    const shipping = shippingInfo.price;
+    const shipping = getShippingCost(country).price;
     let totalAmount = subtotal + shipping;
     totalAmount = Math.round(totalAmount); 
 
     const txRef = 'BX-' + Date.now() + '-' + Math.floor(Math.random() * 1000000);
     const submitBtn = document.getElementById('submitOrderBtn');
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Processing...';
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Redirecting to Stripe...';
 
-    // Save to local storage immediately for Admin Dashboard fallback
-    const orderDetails = {
-        txRef: txRef, items: cart,
-        customer: { firstName, lastName, email, phone, address, city, country, postal },
-        currency: currentCurrency, amount: totalAmount, subtotal, shippingCost: shipping,
-        paymentMethod: 'stripe', status: 'pending', timestamp: new Date().toISOString()
-    };
-    
     try {
+        const orderDetails = {
+            txRef: txRef, items: cart,
+            customer: { firstName, lastName, email, phone, address, city, country, postal },
+            currency: currentCurrency, amount: totalAmount, subtotal, shippingCost: shipping,
+            paymentMethod: 'stripe', status: 'pending', timestamp: new Date().toISOString()
+        };
+        
         const orders = JSON.parse(safeGet('bxclub_orders') || '[]');
         orders.push(orderDetails);
         safeSet('bxclub_orders', JSON.stringify(orders));
         window.dispatchEvent(new StorageEvent('storage', { key: 'bxclub_orders', newValue: JSON.stringify(orders) }));
-    } catch (e) { console.error('Local storage save failed', e); }
 
-    try {
         const response = await fetch('/api/checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                items: cart.map(item => ({ ...item, price: getCartItemPrice(item).price })),
-                customer: { firstName, lastName, email, phone, address, city, country, postal },
+                items: cart.map(item => {
+                    const priceInfo = getCartItemPrice(item);
+                    return { ...item, price: priceInfo.price };
+                }),
+                customer: { 
+                    firstName, 
+                    lastName, 
+                    email, 
+                    phone, 
+                    address, 
+                    city, 
+                    country, 
+                    postal 
+                },
                 amount: totalAmount,
                 currency: currentCurrency,
                 txRef: txRef
@@ -848,6 +838,7 @@ async function placeOrder(e) {
         const data = await response.json();
 
         if (data.url) {
+            showToast('Redirecting to secure payment...');
             window.location.href = data.url;
         } else {
             throw new Error(data.error || 'Failed to create checkout session');
@@ -926,16 +917,40 @@ if (order.customer) { shippingBox.style.display = 'block'; shippingDetails.inner
 if (document.readyState === 'complete' || document.readyState === 'interactive') { renderProducts(); renderFAQs(); updateCartUI(); renderMixMatchGrid1(); }
 </script>
 
+<!-- Enhanced Site Visit Tracking with Location -->
 <script>
-fetch('/api/track', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        page: window.location.pathname,
-        referrer: document.referrer || 'direct',
-        userAgent: navigator.userAgent
-    })
-}).catch(e => console.log('Track error:', e));
+async function trackVisit() {
+    let locationData = { country: 'Unknown', city: 'Unknown' };
+    
+    // 1. Try to get location from IP
+    try {
+        const res = await fetch('https://ipapi.co/json/');
+        if (res.ok) {
+            const data = await res.json();
+            locationData.country = data.country_name || 'Unknown';
+            locationData.city = data.city || 'Unknown';
+        }
+    } catch (e) {
+        console.log('Location fetch failed', e);
+    }
+
+    // 2. Send data to backend
+    fetch('/api/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            page: window.location.pathname,
+            referrer: document.referrer || 'direct',
+            userAgent: navigator.userAgent,
+            timestamp: new Date().toISOString(), // Force fresh, valid timestamp
+            country: locationData.country,
+            city: locationData.city
+        })
+    }).catch(e => console.log('Track error:', e));
+}
+
+// Run tracking immediately
+trackVisit();
 </script>
 <a href="https://wa.me/447538277711" target="_blank" class="whatsapp-float" aria-label="Chat on WhatsApp"><i class="fab fa-whatsapp"></i></a>
 <div class="whatsapp-tooltip">Chat with us on WhatsApp</div>
@@ -956,3 +971,4 @@ fetch('/api/track', {
 </div>
 </body>
 </html>
+ check index.html also
