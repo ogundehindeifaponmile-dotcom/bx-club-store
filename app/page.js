@@ -23,7 +23,7 @@ export default function Home() {
           // YOUR ENTIRE JAVASCRIPT GOES HERE
           // (Copy everything from <script> to </script> from your HTML file)
           // Make sure these two lines are at the top:
-          const STRIPE_PUBLIC_KEY = 'pk_test_YOUR_ACTUAL_KEY';
+          const STRIPE_PUBLIC_KEY = 'pk_live_51UIkNGCFKrLmTsm1ReQRdelWGyckF0MskvUd4qbylqqw9igzw6yNsfsG0VfRm9Dff4hbTMvwe2dv8TwFQZfo9sbJ00f09qM9OW';
           const API_BASE_URL = 'https://bx-club-store.vercel.app';
         </script>
       </body>
