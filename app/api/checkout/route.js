@@ -1,18 +1,17 @@
-import Stripe from 'stripe';
+import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 export async function POST(request) {
   try {
-    const body = await request.json();
-    const { items, customer, currency, shippingCost } = body;
+    const body = await request.json()
+    const { items, customer, currency, shippingCost } = body
 
-    // Convert everything to USD (Stripe's most supported currency)
-    const conversionRate = currency === 'ngn' ? (1 / 1600) : (currency === 'gbp' ? 1.27 : 1);
+    const conversionRate = currency === 'ngn' ? (1 / 1600) : (currency === 'gbp' ? 1.27 : 1)
 
     const lineItems = items.map(item => {
-      const price = currency === 'ngn' ? item.priceNGN : item.priceGBP;
-      const usdPrice = price * conversionRate;
+      const price = currency === 'ngn' ? item.priceNGN : item.priceGBP
+      const usdPrice = price * conversionRate
       
       return {
         price_data: {
@@ -24,8 +23,8 @@ export async function POST(request) {
           unit_amount: Math.round(usdPrice * 100)
         },
         quantity: item.quantity || 1
-      };
-    });
+      }
+    })
 
     if (shippingCost > 0) {
       lineItems.push({
@@ -35,7 +34,7 @@ export async function POST(request) {
           unit_amount: Math.round(shippingCost * conversionRate * 100)
         },
         quantity: 1
-      });
+      })
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -45,11 +44,11 @@ export async function POST(request) {
       customer_email: customer.email,
       success_url: 'https://bx-club-store.vercel.app/index.html?success=true&session_id={CHECKOUT_SESSION_ID}',
       cancel_url: 'https://bx-club-store.vercel.app/index.html?canceled=true'
-    });
+    })
 
-    return Response.json({ url: session.url });
+    return Response.json({ url: session.url })
   } catch (error) {
-    console.error('Error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    console.error('Error:', error)
+    return Response.json({ error: error.message }, { status: 500 })
   }
 }
