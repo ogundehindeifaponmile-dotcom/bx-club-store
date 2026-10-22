@@ -1,58 +1,56 @@
 import Stripe from 'stripe';
+import { Resend } from 'resend';
+import { headers } from 'next/headers';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY);
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export async function POST(req) {
+  const body = await req.text(); // Stripe requires the RAW body, not parsed JSON
+  const headersList = await headers();
+  const signature = headersList.get('stripe-signature');
+
+  let event;
   try {
-    const { items, customer, currency, shippingCost } = await req.json();
-
-    const lineItems = items.map(item => {
-      // Stripe requires amounts in the smallest currency unit (e.g., 100 kobo = 1 NGN)
-      const basePrice = item.priceNGN || (item.priceGBP * 1800);
-      const unitAmount = Math.round(basePrice * 100); 
-      
-      return {
-        price_data: {
-          currency: currency.toLowerCase(), // stripe requires lowercase: 'ngn', 'gbp', etc.
-          product_data: { 
-            name: item.name, 
-            images: item.image ? [item.image] : [] 
-          },
-          unit_amount: unitAmount,
-        },
-        quantity: item.quantity || 1,
-      };
-    });
-
-    if (shippingCost > 0) {
-      lineItems.push({
-        price_data: {
-          currency: currency.toLowerCase(),
-          product_data: { name: 'Shipping' },
-          unit_amount: Math.round(shippingCost * 100),
-        },
-        quantity: 1,
-      });
-    }
-
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: lineItems,
-      mode: 'payment',
-      customer_email: customer.email,
-      // IMPORTANT: Points back to index.html where your success logic lives
-      success_url: `https://bx-club-store.vercel.app/index.html?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `https://bx-club-store.vercel.app/index.html?canceled=true`,
-      metadata: {
-        customerName: `${customer.firstName} ${customer.lastName}`,
-        customerPhone: customer.phone,
-        customerAddress: `${customer.address}, ${customer.city}, ${customer.postal}, ${customer.country}`,
-      }
-    });
-
-    return Response.json({ url: session.url });
-  } catch (error) {
-    console.error('Stripe session error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+  } catch (err) {
+    console.error(`Webhook signature verification failed: ${err.message}`);
+    return new Response(`Webhook Error: ${err.message}`, { status: 400 });
   }
+
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    console.log('💰 Payment successful:', session.id);
+
+    try {
+      await resend.emails.send({
+        from: 'BX CLUB <onboarding@resend.dev>', // Update to your verified Resend domain if you have one
+        to: session.customer_email,
+        subject: 'Order Confirmation - BX CLUB',
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h1 style="color: #0a0a0a;">Thank You for Your Order</h1>
+            <p>Your order has been received and is being prepared.</p>
+            <p><strong>Order Reference:</strong> ${session.id}</p>
+            <p><strong>Total Paid:</strong> ${(session.amount_total / 100).toFixed(2)} ${session.currency.toUpperCase()}</p>
+            <br>
+            <p>If you have any questions, reply to this email or chat with us on WhatsApp.</p>
+          </div>
+        `,
+      });
+      console.log('✅ Email sent to:', session.customer_email);
+    } catch (emailError) {
+      console.error('Failed to send email:', emailError);
+    }
+  }
+
+  return new Response(JSON.stringify({ received: true }), { status: 200 });
 }
+
+// Next.js App Router config to allow reading raw body for Stripe
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
