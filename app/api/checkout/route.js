@@ -7,11 +7,17 @@ export async function POST(req) {
     const { items, customer, currency, shippingCost } = await req.json();
 
     const lineItems = items.map(item => {
-      const unitAmount = Math.round((item.priceNGN || (item.priceGBP * 1800)) * 100); 
+      // Stripe requires amounts in the smallest currency unit (e.g., 100 kobo = 1 NGN)
+      const basePrice = item.priceNGN || (item.priceGBP * 1800);
+      const unitAmount = Math.round(basePrice * 100); 
+      
       return {
         price_data: {
-          currency: currency.toLowerCase(),
-          product_data: { name: item.name, images: [item.image] },
+          currency: currency.toLowerCase(), // stripe requires lowercase: 'ngn', 'gbp', etc.
+          product_data: { 
+            name: item.name, 
+            images: item.image ? [item.image] : [] 
+          },
           unit_amount: unitAmount,
         },
         quantity: item.quantity || 1,
@@ -34,8 +40,9 @@ export async function POST(req) {
       line_items: lineItems,
       mode: 'payment',
       customer_email: customer.email,
-      success_url: `https://bx-club-store.vercel.app/?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `https://bx-club-store.vercel.app/?canceled=true`,
+      // IMPORTANT: Points back to index.html where your success logic lives
+      success_url: `https://bx-club-store.vercel.app/index.html?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `https://bx-club-store.vercel.app/index.html?canceled=true`,
       metadata: {
         customerName: `${customer.firstName} ${customer.lastName}`,
         customerPhone: customer.phone,
