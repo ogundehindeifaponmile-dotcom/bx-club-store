@@ -12,6 +12,7 @@ export async function POST(request) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET)
   } catch (err) {
+    console.error('Webhook Error:', err.message)
     return new Response('Webhook Error', { status: 400 })
   }
 
@@ -24,8 +25,9 @@ export async function POST(request) {
         from: 'BX CLUB <onboarding@resend.dev>',
         to: session.customer_email,
         subject: 'Order Confirmation - BX CLUB',
-        html: '<h1>Thank You for Your Order</h1><p>Your order has been received.</p>'
+        html: '<h1>Thank You for Your Order</h1><p>Your order has been received and is being prepared.</p>'
       })
+      console.log('Email sent to:', session.customer_email)
     } catch (emailError) {
       console.error('Email error:', emailError)
     }
