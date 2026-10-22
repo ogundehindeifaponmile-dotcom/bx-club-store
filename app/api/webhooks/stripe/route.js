@@ -1,56 +1,35 @@
-import Stripe from 'stripe';
-import { Resend } from 'resend';
-import { headers } from 'next/headers';
+import Stripe from 'stripe'
+import { Resend } from 'resend'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-const resend = new Resend(process.env.RESEND_API_KEY);
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+const resend = new Resend(process.env.RESEND_API_KEY)
 
-export async function POST(req) {
-  const body = await req.text(); // Stripe requires the RAW body, not parsed JSON
-  const headersList = await headers();
-  const signature = headersList.get('stripe-signature');
+export async function POST(request) {
+  const body = await request.text()
+  const signature = request.headers.get('stripe-signature')
 
-  let event;
+  let event
   try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET)
   } catch (err) {
-    console.error(`Webhook signature verification failed: ${err.message}`);
-    return new Response(`Webhook Error: ${err.message}`, { status: 400 });
+    return new Response('Webhook Error', { status: 400 })
   }
 
   if (event.type === 'checkout.session.completed') {
-    const session = event.data.object;
-    console.log('💰 Payment successful:', session.id);
+    const session = event.data.object
+    console.log('Payment successful:', session.id)
 
     try {
       await resend.emails.send({
-        from: 'BX CLUB <onboarding@resend.dev>', // Update to your verified Resend domain if you have one
+        from: 'BX CLUB <onboarding@resend.dev>',
         to: session.customer_email,
         subject: 'Order Confirmation - BX CLUB',
-        html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h1 style="color: #0a0a0a;">Thank You for Your Order</h1>
-            <p>Your order has been received and is being prepared.</p>
-            <p><strong>Order Reference:</strong> ${session.id}</p>
-            <p><strong>Total Paid:</strong> ${(session.amount_total / 100).toFixed(2)} ${session.currency.toUpperCase()}</p>
-            <br>
-            <p>If you have any questions, reply to this email or chat with us on WhatsApp.</p>
-          </div>
-        `,
-      });
-      console.log('✅ Email sent to:', session.customer_email);
+        html: '<h1>Thank You for Your Order</h1><p>Your order has been received.</p>'
+      })
     } catch (emailError) {
-      console.error('Failed to send email:', emailError);
+      console.error('Email error:', emailError)
     }
   }
 
-  return new Response(JSON.stringify({ received: true }), { status: 200 });
+  return new Response(JSON.stringify({ received: true }), { status: 200 })
 }
-
-// Next.js App Router config to allow reading raw body for Stripe
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
